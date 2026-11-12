@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI phishing | מערכת הגנה וזיהוי פישינג מתקדמת</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            900: '#0a0505',
+                            800: '#120808',
+                            700: '#1f0d0d',
+                            600: '#331414',
+                            500: '#521a1a',
+                            400: '#852626',
+                            300: '#b83b3b',
+                            200: '#e65c5c',
+                            100: '#f58282',
+                            red: '#ff1f1f',
+                            accent: '#ff3b30'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Cyber Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0505;
+            color: #f3f4f6;
+        }
+        .glow-red {
+            box-shadow: 0 0 25px rgba(255, 31, 31, 0.25);
+        }
+        .glow-red-sm {
+            box-shadow: 0 0 10px rgba(255, 31, 31, 0.15);
+        }
+        .glow-text {
+            text-shadow: 0 0 12px rgba(255, 31, 31, 0.6);
+        }
+        .cyber-border {
+            border: 1px solid rgba(255, 31, 31, 0.3);
+        }
+        .cyber-border:focus-within {
+            border-color: #ff1f1f;
+            box-shadow: 0 0 15px rgba(255, 31, 31, 0.4);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #521a1a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff1f1f;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-cyber-900 text-gray-100 selection:bg-red-600 selection:text-white">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 bg-cyber-800/90 backdrop-blur-md border-b border-cyber-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="switchTab('scanner')">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-cyber-900 flex items-center justify-center glow-red-sm cyber-border">
+                    <i class="fa-solid fa-shield-halved text-2xl text-white"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-wider text-white glow-text">AI <span class="text-red-500">phishing</span></span>
+                    <p class="text-xs text-gray-400">מערכת מתקדמת לזיהוי פישינג</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="hidden md:flex space-x-1 space-x-reverse bg-cyber-900/80 p-1.5 rounded-xl border border-cyber-700">
+                <button onclick="switchTab('scanner')" id="nav-scanner" class="px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-red-600 text-white shadow-lg shadow-red-900/50 flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i> בודק קישורים
+                </button>
+                <button onclick="switchTab('academy')" id="nav-academy" class="px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-300 hover:text-white hover:bg-cyber-700 flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-red-500"></i> אקדמיה
+                </button>
+                <button onclick="switchTab('assistant')" id="nav-assistant" class="px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-300 hover:text-white hover:bg-cyber-700 flex items-center gap-2">
+                    <i class="fa-solid fa-robot text-red-500"></i> עוזר פישינג
+                </button>
+                <button onclick="switchTab('simulator')" id="nav-simulator" class="px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-300 hover:text-white hover:bg-cyber-700 flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad text-red-500"></i> סימולטור
+                </button>
+            </nav>
+
+            <!-- User Auth / Profile Button -->
+            <div class="flex items-center gap-3">
+                <div id="user-profile-display" class="hidden items-center gap-2 bg-cyber-900 border border-cyber-700 px-3 py-1.5 rounded-xl cursor-pointer hover:border-red-500 transition" onclick="openProfileSettingsModal()" title="הגדרות פרופיל">
+                    <div id="user-avatar-container" class="w-8 h-8 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400 font-bold text-xs overflow-hidden">
+                        <span id="user-avatar-initial">U</span>
+                    </div>
+                    <span id="user-display-name-text" class="text-xs text-gray-200 font-semibold hidden sm:inline"></span>
+                    <button onclick="event.stopPropagation(); logoutUser();" class="text-gray-400 hover:text-red-400 text-xs px-2 py-1 transition ml-1" title="התנתק">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+                <button id="auth-modal-btn" onclick="openAuthModal()" class="px-4 py-2.5 bg-cyber-900 hover:bg-cyber-700 border border-red-600/50 text-red-400 text-sm font-bold rounded-xl transition flex items-center gap-2 glow-red-sm">
+                    <i class="fa-solid fa-user-lock"></i> התחבר / הרשם
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="md:hidden flex items-center">
+                <button onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white focus:outline-none p-2 rounded-lg bg-cyber-700">
+                    <i class="fa-solid fa-bars text-xl" id="mobile-menu-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-cyber-800 border-b border-cyber-700 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('scanner'); toggleMobileMenu();" class="w-full text-right px-4 py-3 rounded-lg text-sm font-semibold bg-red-600 text-white flex items-center gap-3">
+                <i class="fa-solid fa-magnifying-glass-chart"></i> בודק קישורים
+            </button>
+            <button onclick="switchTab('academy'); toggleMobileMenu();" class="w-full text-right px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-cyber-700 flex items-center gap-3">
+                <i class="fa-solid fa-graduation-cap text-red-500"></i> אקדמיה
+            </button>
+            <button onclick="switchTab('assistant'); toggleMobileMenu();" class="w-full text-right px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-cyber-700 flex items-center gap-3">
+                <i class="fa-solid fa-robot text-red-500"></i> עוזר פישינג
+            </button>
+            <button onclick="switchTab('simulator'); toggleMobileMenu();" class="w-full text-right px-4 py-3 rounded-lg text-sm font-semibold text-gray-300 hover:bg-cyber-700 flex items-center gap-3">
+                <i class="fa-solid fa-gamepad text-red-500"></i> סימולטור
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- ==================== TAB 1: SCANNER ==================== -->
+        <section id="tab-scanner" class="space-y-8">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/80 border border-red-600/40 text-red-400 text-xs font-bold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> מנוע סריקה ואנליזה חכם
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                    בדוק כל <span class="text-red-500 glow-text">קישור או הודעה</span> לחשד לפישינג
+                </h1>
+                <p class="text-gray-400 text-base sm:text-lg">
+                    הדבק כתובת אתר חשודה, מייל או תוכן הודעה לבדיקת מילות מפתח, דפוסים זדוניים וזיופי דומיינים בזמן אמת.
+                </p>
+            </div>
+
+            <!-- Scanner Box -->
+            <div class="max-w-4xl mx-auto bg-cyber-800 rounded-2xl cyber-border glow-red p-6 sm:p-8 space-y-6">
+                <div class="space-y-2">
+                    <label for="scan-input" class="block text-sm font-semibold text-gray-300 flex items-center gap-2">
+                        <i class="fa-solid fa-link text-red-500"></i> הזן כתובת URL או תוכן חשוד לבדיקה:
+                    </label>
+                    <div class="relative flex flex-col sm:flex-row gap-3">
+                        <div class="relative flex-grow">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-500">
+                                <i class="fa-solid fa-globe"></i>
+                            </span>
+                            <input type="text" id="scan-input" placeholder="לדוגמה: https://secure-login-bank-update.com או הודעת SMS חשודה..."
+                                class="w-full pr-11 pl-4 py-4 bg-cyber-900 border border-cyber-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-sm sm:text-base">
+                        </div>
+                        <button onclick="runScan()" class="px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-900/50 transition-all transform active:scale-95 flex items-center justify-center gap-2 shrink-0">
+                            <i class="fa-solid fa-shield-virus"></i> סרוק עכשיו
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Test Examples -->
+                <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-cyber-700/60">
+                    <span class="text-xs text-gray-400 font-medium">דוגמאות לבדיקה מהירה:</span>
+                    <button onclick="setExample('https://paypal-security-update-account.com/login')" class="text-xs bg-cyber-900 hover:bg-cyber-700 border border-cyber-600 text-red-400 px-3 py-1.5 rounded-lg transition">PayPal פיקטיבי</button>
+                    <button onclick="setExample('urgent: verify your bank account immediately at http://192.168.1.50/bank')" class="text-xs bg-cyber-900 hover:bg-cyber-700 border border-cyber-600 text-red-400 px-3 py-1.5 rounded-lg transition">הודעת בנק דחופה</button>
+                    <button onclick="setExample('https://www.google.com')" class="text-xs bg-cyber-900 hover:bg-cyber-700 border border-cyber-600 text-green-400 px-3 py-1.5 rounded-lg transition">גוגל (לגיטימי)</button>
+                </div>
+            </div>
+
+            <!-- Scan Loader Container (Shown during scanning) -->
+            <div id="scan-loader" class="max-w-4xl mx-auto hidden bg-cyber-800 rounded-2xl cyber-border p-8 text-center space-y-4">
+                <div class="inline-block w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                <h3 class="text-xl font-bold text-white" id="loader-status-text">מנתח את הקישור במנועי הסייבר...</h3>
+                <div class="w-full bg-cyber-900 rounded-full h-3 border border-cyber-700 max-w-md mx-auto overflow-hidden">
+                    <div id="loader-bar" class="bg-red-600 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <p class="text-xs text-gray-400">בדיקת דומיין, מוניטין שולח, דפוסי פישינג ואבטחת SSL...</p>
+            </div>
+
+            <!-- Scan Results Container (Hidden by default) -->
+            <div id="scan-results" class="max-w-4xl mx-auto hidden space-y-6">
+                <!-- Result Card -->
+                <div id="result-card" class="bg-cyber-800 rounded-2xl border p-6 sm:p-8 space-y-6 transition-all">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-cyber-700 pb-6">
+                        <div class="flex items-center gap-4">
+                            <div id="result-icon-box" class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl">
+                                <i id="result-icon" class="fa-solid"></i>
+                            </div>
+                            <div>
+                                <span id="result-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase"></span>
+                                <h3 id="result-title" class="text-2xl font-bold text-white mt-1"></h3>
+                            </div>
+                        </div>
+                        <div class="text-left bg-cyber-900 px-4 py-3 rounded-xl border border-cyber-700 w-full sm:w-auto">
+                            <span class="text-xs text-gray-400 block">מדד סיכון (Risk Score):</span>
+                            <span id="result-score" class="text-2xl font-black"></span>
+                        </div>
+                    </div>
+
+                    <!-- Details breakdown -->
+                    <div class="space-y-4">
+                        <h4 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">ניתוח רכיבים והתנהגות:</h4>
+                        <div id="result-factors" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Recommended Action -->
+                    <div id="result-recommendation" class="p-4 rounded-xl border flex items-start gap-3">
+                        <i class="fa-solid fa-triangle-exclamation text-xl mt-0.5 shrink-0" id="rec-icon"></i>
+                        <div>
+                            <h5 class="font-bold text-sm" id="rec-title"></h5>
+                            <p class="text-xs text-gray-300 mt-1" id="rec-desc"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: ACADEMY ==================== -->
+        <section id="tab-academy" class="hidden space-y-12">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/80 border border-red-600/40 text-red-400 text-xs font-bold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span> מרכז למידה וידע סייבר
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                    אקדמיית <span class="text-red-500 glow-text">פישינג</span>
+                </h1>
+                <p class="text-gray-400 text-base sm:text-lg">
+                    למד כיצד פועלים תוקפים ברשת, מהם סוגי הפישינג הנפוצים ביותר, ואיך לזהות את סימני האזהרה לפני שיהיה מאוחר מדי.
+                </p>
+            </div>
+
+            <!-- Academy Grid / Modules -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Module 1 -->
+                <div onclick="openAcademyModal(1)" class="bg-cyber-800 rounded-2xl cyber-border p-6 hover:border-red-500 transition cursor-pointer group flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-xl bg-red-950/60 border border-red-600/40 flex items-center justify-center text-red-500 text-2xl group-hover:scale-110 transition">
+                            <i class="fa-solid fa-fish"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white group-heading">מה זה פישינג (Phishing)?</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            הכרת המושג הבסיסי, מטרות התוקפים (גניבת סיסמאות, כרטיסי אשראי וזהות) ושיטות ההתחזות לגופים רשמיים.
+                        </p>
+                    </div>
+                    <div class="flex items-center text-red-400 text-sm font-semibold gap-2 pt-2 border-t border-cyber-700">
+                        <span>קרא מדריך מלא</span> <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Module 2 -->
+                <div onclick="openAcademyModal(2)" class="bg-cyber-800 rounded-2xl cyber-border p-6 hover:border-red-500 transition cursor-pointer group flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-xl bg-red-950/60 border border-red-600/40 flex items-center justify-center text-red-500 text-2xl group-hover:scale-110 transition">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">נורות אזהרה וסימנים מחשידים</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            כיצד תזהו כתובות URL מזויפות (Typosquatting), דחיפות מלאכותיות במיילים ושגיאות כתיב בולטות.
+                        </p>
+                    </div>
+                    <div class="flex items-center text-red-400 text-sm font-semibold gap-2 pt-2 border-t border-cyber-700">
+                        <span>קרא מדריך מלא</span> <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Module 3 -->
+                <div onclick="openAcademyModal(3)" class="bg-cyber-800 rounded-2xl cyber-border p-6 hover:border-red-500 transition cursor-pointer group flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="w-14 h-14 rounded-xl bg-red-950/60 border border-red-600/40 flex items-center justify-center text-red-500 text-2xl group-hover:scale-110 transition">
+                            <i class="fa-solid fa-shield-cat"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">סוגי פישינג מתקדמים</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            הכרת מתקפות ממוקדות: ספיר פישינג (Spear Phishing), וישינג (Vishing - טלפוני), וסמישינג (Smishing - SMS).
+                        </p>
+                    </div>
+                    <div class="flex items-center text-red-400 text-sm font-semibold gap-2 pt-2 border-t border-cyber-700">
+                        <span>קרא מדריך מלא</span> <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Practices Banner -->
+            <div class="bg-cyber-800 rounded-2xl cyber-border p-8 space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-red-600/20 border border-red-500/50 flex items-center justify-center text-red-500">
+                        <i class="fa-solid fa-list-check text-lg"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">כללים חיוניים להיגיינת סייבר אישית</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-cyber-900 p-4 rounded-xl border border-cyber-700 space-y-2">
+                        <div class="text-red-500 font-black text-lg">01</div>
+                        <h4 class="font-bold text-white text-sm">אימות דו-שלבי (2FA)</h4>
+                        <p class="text-xs text-gray-400">הפעל תמיד 2FA בכל החשבונות החשובים שלך (גוגל, בנק, רשתות חברתיות).</p>
+                    </div>
+                    <div class="bg-cyber-900 p-4 rounded-xl border border-cyber-700 space-y-2">
+                        <div class="text-red-500 font-black text-lg">02</div>
+                        <h4 class="font-bold text-white text-sm">בדוק את השולח בקפידה</h4>
+                        <p class="text-xs text-gray-400">אל תסתמך רק על שם התצוגה במייל; בדוק את כתובת המייל המלאה של השולח.</p>
+                    </div>
+                    <div class="bg-cyber-900 p-4 rounded-xl border border-cyber-700 space-y-2">
+                        <div class="text-red-500 font-black text-lg">03</div>
+                        <h4 class="font-bold text-white text-sm">הימנע מלחיצה עיוורת</h4>
+                        <p class="text-xs text-gray-400">רחף עם העכבר מעל קישורים לפני לחיצה כדי לוודא את היעד האמיתי שלהם.</p>
+                    </div>
+                    <div class="bg-cyber-900 p-4 rounded-xl border border-cyber-700 space-y-2">
+                        <div class="text-red-500 font-black text-lg">04</div>
+                        <h4 class="font-bold text-white text-sm">לעולם אל תמסור סיסמאות</h4>
+                        <p class="text-xs text-gray-400">בנקים וחברות טכנולוגיה לעולם לא יבקשו ממך סיסמה או קוד אימות בטלפון או במייל.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: ASSISTANT CHATBOT ==================== -->
+        <section id="tab-assistant" class="hidden space-y-6">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/80 border border-red-600/40 text-red-400 text-xs font-bold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> עוזר סייבר חכם בזמן אמת
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                    עוזר <span class="text-red-500 glow-text">פישינג AI</span>
+                </h1>
+                <p class="text-gray-400 text-base sm:text-lg">
+                    שאל את הבוט כל שאלה בנושא אבטחת מידע, איך להימנע מהונאות, או כיצד להתמודד עם הודעה חשודה שקיבלת.
+                </p>
+            </div>
+
+            <!-- Chat Window Box -->
+            <div class="max-w-3xl mx-auto bg-cyber-800 rounded-2xl cyber-border glow-red flex flex-col h-[550px] overflow-hidden">
+                <!-- Chat Header -->
+                <div class="bg-cyber-900 px-6 py-4 border-b border-cyber-700 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white font-bold shadow-lg">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-cyber-900 rounded-full"></span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm">בוט הגנה פישינג (AI)</h3>
+                            <p class="text-xs text-gray-400">זמין לענות על כל שאלות הסייבר שלך</p>
+                        </div>
+                    </div>
+                    <button onclick="clearChat()" class="text-xs text-gray-400 hover:text-red-400 px-3 py-1.5 rounded-lg bg-cyber-800 border border-cyber-700 transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> נקה שיחה
+                    </button>
+                </div>
+
+                <!-- Chat Messages Area -->
+                <div id="chat-messages" class="flex-grow p-6 overflow-y-auto space-y-4 bg-cyber-900/50">
+                    <!-- Initial Bot Message -->
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white shrink-0">
+                            <i class="fa-solid fa-robot text-xs"></i>
+                        </div>
+                        <div class="bg-cyber-800 border border-cyber-700 rounded-2xl p-4 text-sm text-gray-200 max-w-lg space-y-2">
+                            <p>שלום! אני עוזר הפישינג החכם שלך. קיבלת הודעה חשודה? אתה רוצה לדעת איך לשמור על סיסמאות חזקות? שאל אותי חופשי כל מה שתרצה!</p>
+                            <div class="flex flex-wrap gap-2 pt-2">
+                                <button onclick="sendPresetQuery('איך מזהים מייל פישינג מתחזה?')" class="text-xs bg-cyber-900 hover:bg-cyber-700 text-red-400 border border-cyber-600 px-2.5 py-1 rounded-md transition">איך מזהים מייל פישינג?</button>
+                                <button onclick="sendPresetQuery('מה לעשות אם לחצתי על קישור פישינג?')" class="text-xs bg-cyber-900 hover:bg-cyber-700 text-red-400 border border-cyber-600 px-2.5 py-1 rounded-md transition">לחצתי על קישור זדוני, מה עושים?</button>
+                                <button onclick="sendPresetQuery('איך ליצור סיסמה חזקה שלא ניתנת לפריצה?')" class="text-xs bg-cyber-900 hover:bg-cyber-700 text-red-400 border border-cyber-600 px-2.5 py-1 rounded-md transition">טיפים לסיסמה חזקה</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Area -->
+                <div class="p-4 bg-cyber-900 border-t border-cyber-700 flex items-center gap-3">
+                    <input type="text" id="chat-input" placeholder="שאל את העוזר שאלה בנושא פישינג ואבטחה..." 
+                        onkeydown="if(event.key === 'Enter') sendChatMessage()"
+                        class="flex-grow px-4 py-3 bg-cyber-800 border border-cyber-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 text-sm">
+                    <button onclick="sendChatMessage()" class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition shadow-lg shadow-red-900/50 flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-paper-plane"></i> שלח
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: SIMULATOR / QUIZ ==================== -->
+        <section id="tab-simulator" class="hidden space-y-8">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/80 border border-red-600/40 text-red-400 text-xs font-bold tracking-wide uppercase">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span> אתגר זיהוי אינטראקטיבי
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                    סימולטור <span class="text-red-500 glow-text">זיהוי פישינג</span>
+                </h1>
+                <p class="text-gray-400 text-base sm:text-lg">
+                    בחן את עצמך: האם תוכל לזהות אילו הודעות הן אמיתיות ואילו מהוות ניסיון פישינג זדוני?
+                </p>
+            </div>
+
+            <!-- Quiz Card Box -->
+            <div class="max-w-3xl mx-auto bg-cyber-800 rounded-2xl cyber-border glow-red p-6 sm:p-8 space-y-6">
+                <div class="flex items-center justify-between border-b border-cyber-700 pb-4">
+                    <span id="quiz-progress" class="text-xs font-bold text-red-400 bg-red-950 px-3 py-1 rounded-full border border-red-600/40">שאלה 1 מתוך 3</span>
+                    <span id="quiz-score-badge" class="text-xs font-bold text-white bg-cyber-900 px-3 py-1 rounded-full border border-cyber-700">ציון: 0</span>
+                </div>
+
+                <div id="quiz-content" class="space-y-4">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div id="quiz-feedback" class="hidden p-4 rounded-xl border space-y-1"></div>
+
+                <div class="flex justify-end pt-2">
+                    <button id="next-quiz-btn" onclick="nextQuizQuestion()" class="hidden px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition text-sm flex items-center gap-2">
+                        <span>השאלה הבאה</span> <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Auth Modal (Gmail & Password) -->
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-cyber-800 border border-red-600/50 rounded-2xl max-w-md w-full p-6 sm:p-8 space-y-6 glow-red relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white bg-cyber-900 w-10 h-10 rounded-full flex items-center justify-center border border-cyber-700">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 text-2xl mx-auto">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3 id="auth-modal-title" class="text-2xl font-bold text-white">התחברות לחשבון AI phishing</h3>
+                <p class="text-xs text-gray-400">שמור את ההתקדמות והתוצאות שלך עם כתובת Gmail וסיסמה</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-gray-300">שם מלא:</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 pointer-events-none">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="auth-fullname" placeholder="ישראל ישראלי" class="w-full pr-10 pl-4 py-3 bg-cyber-900 border border-cyber-700 rounded-xl text-white text-sm focus:outline-none focus:border-red-500">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-gray-300">כתובת Gmail:</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 pointer-events-none">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input type="email" id="auth-gmail" placeholder="example@gmail.com" class="w-full pr-10 pl-4 py-3 bg-cyber-900 border border-cyber-700 rounded-xl text-white text-sm focus:outline-none focus:border-red-500">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-gray-300">סיסמה:</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 pointer-events-none">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="auth-password" placeholder="••••••••" class="w-full pr-10 pl-4 py-3 bg-cyber-900 border border-cyber-700 rounded-xl text-white text-sm focus:outline-none focus:border-red-500">
+                    </div>
+                </div>
+
+                <button onclick="handleAuthSubmit()" class="w-full py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition shadow-lg shadow-red-900/50 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> <span id="auth-submit-btn-text">התחבר / צור חשבון</span>
+                </button>
+            </div>
+
+            <div class="text-center pt-2 border-t border-cyber-700">
+                <p class="text-xs text-gray-400">הנתונים שלך נשמרים בצורה מאובטחת במערכת האישית שלך.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Settings Modal -->
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-cyber-800 border border-red-600/50 rounded-2xl max-w-md w-full p-6 sm:p-8 space-y-6 glow-red relative">
+            <button onclick="closeProfileSettingsModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white bg-cyber-900 w-10 h-10 rounded-full flex items-center justify-center border border-cyber-700">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 rounded-2xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 text-3xl mx-auto overflow-hidden shadow-lg shadow-red-900/30" id="profile-modal-avatar-preview">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white">הגדרות פרופיל משתמש</h3>
+                <p class="text-xs text-gray-400" id="profile-modal-email-sub"></p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-gray-300">שם מלא:</label>
+                    <input type="text" id="edit-fullname" class="w-full px-4 py-3 bg-cyber-900 border border-cyber-700 rounded-xl text-white text-sm focus:outline-none focus:border-red-500">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-gray-300">הדבק קישור תמונה מגוגל (Image Address):</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="edit-avatar-url" placeholder="הדבק כאן כתובת URL של תמונה מגוגל..." oninput="previewAvatarInput(this.value)" class="w-full px-4 py-3 bg-cyber-900 border border-cyber-700 rounded-xl text-white text-sm focus:outline-none focus:border-red-500">
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-1">טיפ: לחץ קליק ימני על תמונה בגוגל -> בחר ״העתק כתובת תמונה״ (Copy image address) והדבק כאן.</p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-xs font-semibold text-gray-300">או בחר תמונת אוואטר מוכנה מראש:</label>
+                    <div class="grid grid-cols-4 gap-2 pt-1">
+                        <button type="button" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150')" class="p-2 bg-cyber-900 hover:border-red-500 border border-cyber-700 rounded-xl flex items-center justify-center transition">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" class="w-10 h-10 rounded-lg object-cover" alt="avatar 1">
+                        </button>
+                        <button type="button" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150')" class="p-2 bg-cyber-900 hover:border-red-500 border border-cyber-700 rounded-xl flex items-center justify-center transition">
+                            <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150" class="w-10 h-10 rounded-lg object-cover" alt="avatar 2">
+                        </button>
+                        <button type="button" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150')" class="p-2 bg-cyber-900 hover:border-red-500 border border-cyber-700 rounded-xl flex items-center justify-center transition">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" class="w-10 h-10 rounded-lg object-cover" alt="avatar 3">
+                        </button>
+                        <button type="button" onclick="selectPresetAvatar('')" class="p-2 bg-cyber-900 hover:border-red-500 border border-cyber-700 rounded-xl flex items-center justify-center text-xs text-gray-400 transition">
+                            אפס ברירת מחדל
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="saveProfileChanges()" class="w-full py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition shadow-lg shadow-red-900/50 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> שמור שינויים
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academy Modal Popup -->
+    <div id="academy-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-cyber-800 border border-red-600/50 rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 glow-red relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAcademyModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white bg-cyber-900 w-10 h-10 rounded-full flex items-center justify-center border border-cyber-700">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3">
+                <div id="modal-icon" class="w-12 h-12 rounded-xl bg-red-950/80 border border-red-600/50 flex items-center justify-center text-red-500 text-xl"></div>
+                <h3 id="modal-title" class="text-2xl font-bold text-white"></h3>
+            </div>
+            <div id="modal-body" class="text-gray-300 text-sm sm:text-base space-y-4 leading-relaxed"></div>
+            <div class="pt-4 border-t border-cyber-700 flex justify-end">
+                <button onclick="closeAcademyModal()" class="px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition text-sm">הבנתי, סגור</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-cyber-800 border-t border-cyber-700 mt-16 py-8 text-center text-gray-400 text-xs sm:text-sm">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-medium text-gray-300">CyberGuard AI & Phishing Defense Academy &copy; 2026</p>
+            <p>הכלי נועד למטרות לימוד, מודעות והגנה מפני הונאות סייבר ברשת.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Tab Navigation Switcher
+        function switchTab(tabId) {
+            const tabs = ['scanner', 'academy', 'assistant', 'simulator'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                if(sec) sec.classList.add('hidden');
+                const btn = document.getElementById(`nav-${t}`);
+                if(btn) {
+                    btn.className = "px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-300 hover:text-white hover:bg-cyber-700 flex items-center gap-2";
+                }
+            });
+
+            const activeSec = document.getElementById(`tab-${tabId}`);
+            if(activeSec) activeSec.classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if(activeBtn) {
+                activeBtn.className = "px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-red-600 text-white shadow-lg shadow-red-900/50 flex items-center gap-2";
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function setExample(text) {
+            document.getElementById('scan-input').value = text;
+            runScan();
+        }
+
+        // Assistant Chatbot Logic
+        function sendPresetQuery(queryText) {
+            document.getElementById('chat-input').value = queryText;
+            sendChatMessage();
+        }
+
+        function clearChat() {
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white shrink-0">
+                        <i class="fa-solid fa-robot text-xs"></i>
+                    </div>
+                    <div class="bg-cyber-800 border border-cyber-700 rounded-2xl p-4 text-sm text-gray-200 max-w-lg space-y-2">
+                        <p>השיחה נוקתה. כיצד אוכל לעזור לך היום במניעת פישינג ואבטחת מידע?</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function sendChatMessage() {
+            const inputField = document.getElementById('chat-input');
+            const messageText = inputField.value.trim();
+            if(!messageText) return;
+
+            const messagesContainer = document.getElementById('chat-messages');
+
+            // Append user message
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = "flex items-start gap-3 justify-end";
+            userMsgDiv.innerHTML = `
+                <div class="bg-red-600/20 border border-red-500/40 rounded-2xl p-4 text-sm text-gray-100 max-w-lg">
+                    <p>${escapeHtml(messageText)}</p>
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-cyber-700 flex items-center justify-center text-gray-300 shrink-0">
+                    <i class="fa-solid fa-user text-xs"></i>
+                </div>
+            `;
+            messagesContainer.appendChild(userMsgDiv);
+            inputField.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = "flex items-start gap-3";
+            typingDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white shrink-0">
+                    <i class="fa-solid fa-robot text-xs"></i>
+                </div>
+                <div class="bg-cyber-800 border border-cyber-700 rounded-2xl p-4 text-sm text-gray-400 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-bounce"></span>
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-bounce [animation-delay:0.4s]"></span>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Simulate intelligent assistant response
+            setTimeout(() => {
+                document.getElementById('typing-indicator')?.remove();
+                
+                let botReply = getAIResponse(messageText);
+
+                const botMsgDiv = document.createElement('div');
+                botMsgDiv.className = "flex items-start gap-3";
+                botMsgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white shrink-0">
+                        <i class="fa-solid fa-robot text-xs"></i>
+                    </div>
+                    <div class="bg-cyber-800 border border-cyber-700 rounded-2xl p-4 text-sm text-gray-200 max-w-lg space-y-2">
+                        <p>${botReply}</p>
+                    </div>
+                `;
+                messagesContainer.appendChild(botMsgDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+        }
+
+        function getAIResponse(text) {
+            const lower = text.toLowerCase();
+            
+            // Checking if query is outside phishing/cybersecurity domain (except questions about the website itself)
+            const generalKeywords = ['מזג אוויר', 'מתכון', 'כדורגל', 'סרט', 'שיר', 'בדיחה', 'טיסה', 'משחק', 'תל אביב', 'weather', 'movie', 'recipe', 'football'];
+            const isOffTopic = generalKeywords.some(kw => lower.includes(kw));
+
+            // Check if user is asking about the website purpose
+            const isAskingAboutSite = (
+                (lower.includes('מטרה') && (lower.includes('האתר') || lower.includes('זה') || lower.includes('ai phishing'))) ||
+                lower.includes('מה זה האתר') ||
+                lower.includes('על מה האתר') ||
+                lower.includes('מה עושה האתר') ||
+                lower.includes('ספר לי על האתר')
+            );
+
+            if (isOffTopic && !isAskingAboutSite) {
+                return "היי! כמודל ה-AI שלך המומחה באבטחת מידע ופישינג תחת פלטפורמת <strong>AI phishing</strong>, אני ממוקד אך ורק בנושאי סייבר, מניעת הונאות ואבטחת חשבונות. אשמח לעזור לך בכל שאלה שקשורה לבדיקת קישורים, ניתוח הודעות חשודות או פיתוח מודעות אבטחה!";
+            }
+
+            if (isAskingAboutSite) {
+                return "האתר <strong>AI phishing</strong> הוא פלטפורמה מתקדמת ואינטראקטיבית שנועדה להגן עליך מפני ניסיונות פישינג והונאות סייבר ברשת. המערכת כוללת מספר כלים מרכזיים:<br>1. <strong>בודק קישורים חכם:</strong> מאפשר לך להזין קישורים או הודעות לבדיקת סיכונים אוטומטית עם מדד אחוזי אזהרה וניתוח רכיבים.<br>2. <strong>אקדמיית פישינג:</strong> מרכז ידע מקיף המלמד מה זה פישינג, מהן נורות האזהרה הבולטות, ואיך לשמור על היגיינת סייבר.<br>3. <strong>עוזר פישינג (AI):</strong> בוט חכם המלווה אותך בזמן אמת ומספק מענה מקצועי לכל שאלה בנושא.<br>4. <strong>סימולטור אתגרים:</strong> משחק אינטראקטיבי לבחינת יכולת הזיהוי של הודעות פישינג מול הודעות אמיתיות.";
+            } else if(lower.includes('מייל') || lower.includes('מזהים') || lower.includes('דואל') || lower.includes('הודעה')) {
+                return "כדי לזהות מייל פישינג בצורה מקצועית, אני ממליץ לשים לב לנקודות הבאות:<br>• <strong>כתובת השולח המלאה:</strong> תוקפים נוטים להשתמש בדומיינים דומים במתכוון (כמו <code>support@paypa1.com</code>).<br>• <strong>דחיפות מלאכותית ואיומים:</strong> הודעות המנסות להلחיץ אותך לפעול מיד כדי למנוע חסימת חשבון.<br>• <strong>קישורים זדוניים:</strong> ריחוף עם העכבר מעل הקישור יחשוף את יעד ההפניה האמיתי ששונה מהכתובת המוצגת.";
+            } else if(lower.includes('לחצתי') || lower.includes('קישור') || lower.includes('הזנתי') || lower.includes('מסרתי')) {
+                return "פעולה מהירה היא קריטית במצב כזה! אם לחצת על קישור זדוני או מסרת פרטים רגישים:<br>1. <strong>נתק את המכשיר מהרשת</strong> (Wi-Fi או אינטרנט) מיד כדי למנוע גישה נוספת.<br>2. שנה את הסיסמאות לחשבונות החשובים שלך ממכשיר אחר ובטוח.<br>3. צור קשר מיידית עם הבנק או חברת האשראי אם מסרת פרטים פיננסיים.<br>4. הפעל אימות דו-שלבי (2FA) בכל חשבון שעדיין לא מוגן כך.";
+            } else if(lower.includes('סיסמה') || lower.includes('סיסמאות') || lower.includes('חזקה')) {
+                return "כדי לשמור על סיסמאות חזקות ובטוחות מפני פריצות ופישינג:<br>• השתמש בסיסמה ארוכה (לפחות 12 תווים) המשלבת אותיות גדולות וקטנות, מספרים וסימנים מיוחדים.<br>• הימנע משימוש חוזר באותה סיסמה במספר שירותים שונים.<br>• השתמש במנהל סיסמאות מוסמך והפעל אימות דו-שלבי (2FA).";
+            } else if(lower.includes('סמישינג') || lower.includes('sms') || lower.includes('הודעת טקסט') || lower.includes('דואר ישראל')) {
+                return "סמישינג הוא סוג של פישינג המבוצע דרך הודעות SMS או אפליקציות מסרים. דוגמה נפוצה היא הודעה שקרית מחברת שליחויות הדורשת תשלום קטן לשחרור חבילה. זכור: גופים רשמיים לא יבקשו ממך פרטי אשראי או תשלום בקישור מזדמן בהודעת טקסט.";
+            } else {
+                return "אני כאן כדי לעזור לך בכל מה שקשור לאבטחת מידע, זיהוי ניסיונות פישינג והתגוננות מפני הונאות ברשת. מה תרצה שנבדוק או נלמד כעת?";
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Scanner Simulation Logic with animated scan loader
+        function runScan() {
+            const inputVal = document.getElementById('scan-input').value.trim();
+            const resultsContainer = document.getElementById('scan-results');
+            const loaderContainer = document.getElementById('scan-loader');
+            const loaderBar = document.getElementById('loader-bar');
+            const loaderStatusText = document.getElementById('loader-status-text');
+
+            if(!inputVal) {
+                alertBox('אנא הזן טקסט או קישור לבדיקה.');
+                return;
+            }
+
+            // Hide previous results and show loader
+            resultsContainer.classList.add('hidden');
+            loaderContainer.classList.remove('hidden');
+            loaderContainer.scrollIntoView({ behavior: 'smooth' });
+            loaderBar.style.width = '0%';
+
+            // Step-by-step progress simulation
+            let progress = 0;
+            const steps = [
+                { percent: 25, text: "בודק מוניטין דומיין בבסיסי הנתונים..." },
+                { percent: 50, text: "מחפש דפוסי פישינג ומילות לחץ בתוכן..." },
+                { percent: 80, text: "מנתח פרוטוקול אבטחה והפניות חשודות..." },
+                { percent: 100, text: "מייצר מדד סיכון סופי..." }
+            ];
+
+            let stepIndex = 0;
+            const interval = setInterval(() => {
+                if (stepIndex < steps.length) {
+                    loaderBar.style.width = steps[stepIndex].percent + '%';
+                    loaderStatusText.innerText = steps[stepIndex].text;
+                    stepIndex++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loaderContainer.classList.add('hidden');
+                        displayScanResults(inputVal);
+                    }, 400);
+                }
+            }, 350);
+        }
+
+        function displayScanResults(inputVal) {
+            const resultsContainer = document.getElementById('scan-results');
+            const resultCard = document.getElementById('result-card');
+            const iconBox = document.getElementById('result-icon-box');
+            const icon = document.getElementById('result-icon');
+            const badge = document.getElementById('result-badge');
+            const title = document.getElementById('result-title');
+            const score = document.getElementById('result-score');
+            const factors = document.getElementById('result-factors');
+            const recIcon = document.getElementById('rec-icon');
+            const recTitle = document.getElementById('rec-title');
+            const recDesc = document.getElementById('rec-desc');
+            const recContainer = document.getElementById('result-recommendation');
+
+            resultsContainer.classList.remove('hidden');
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+
+            let isPhishing = false;
+            let riskScore = 15;
+            let detectedFactors = [];
+
+            const lower = inputVal.toLowerCase();
+            const phishingKeywords = ['login', 'verify', 'update', 'bank', 'secure', 'paypal', 'account', 'urgent', '192.', 'free', 'win', 'prize', 'suspend'];
+            
+            let matches = 0;
+            phishingKeywords.forEach(kw => {
+                if(lower.includes(kw)) matches++;
+            });
+
+            if(lower.includes('http://') || lower.includes('192.') || matches >= 2 || lower.includes('paypal-') || lower.includes('bank-')) {
+                isPhishing = true;
+                riskScore = Math.floor(Math.random() * 20) + 80; // 80-99%
+            } else if(matches === 1) {
+                riskScore = Math.floor(Math.random() * 30) + 45; // 45-75%
+                isPhishing = riskScore > 60;
+            } else {
+                riskScore = Math.floor(Math.random() * 15) + 3; // 3-18%
+            }
+
+            if(isPhishing || riskScore > 60) {
+                resultCard.className = "bg-cyber-800 rounded-2xl border border-red-600/60 p-6 sm:p-8 space-y-6 glow-red";
+                iconBox.className = "w-16 h-16 rounded-2xl bg-red-950 border border-red-600/50 flex items-center justify-center text-3xl text-red-500";
+                icon.className = "fa-solid fa-triangle-exclamation";
+                badge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase bg-red-950 text-red-400 border border-red-600/40";
+                badge.innerText = "אזהרה: זוהה חשד גבוה לפישינג!";
+                title.innerText = "הקישור/תוכן זוהה כזדוני או מחשיד";
+                score.innerText = riskScore + "%";
+                score.className = "text-2xl font-black text-red-500";
+
+                detectedFactors = [
+                    { title: "מילות דחיפות והפחדה", desc: "זוהו מילות מפתח המעוררות לחץ לנקוט פעולה מהירה.", status: "danger" },
+                    { title: "דומיין או כתובת חשודה", desc: "מבנה הדומיין אינו תואם את המותג הרשמי המוצהר.", status: "danger" },
+                    { title: "היעדר פרוטוקול מאובטח מלא", desc: "חשש לשימוש בפרוטוקול לא מוצפן או הפנייה לכתובת IP ישירה.", status: "warning" },
+                    { title: "דפוס התחזות מוכר", desc: "התוכן תואם דפוסי הונאה נפוצים לגניבת פרטי התחברות.", status: "danger" }
+                ];
+
+                recContainer.className = "p-4 rounded-xl border bg-red-950/40 border-red-600/50 flex items-start gap-3";
+                recIcon.className = "fa-solid fa-ban text-red-500 text-xl mt-0.5 shrink-0";
+                recTitle.className = "font-bold text-sm text-red-400";
+                recTitle.innerText = "פעולה מומלצת: אל תלחץ ואל תזין פרטים!";
+                recDesc.innerText = "מומלץ לחסום את השולח, להימנע מלחיצה על הקישורים ובשום אופן לא להזין סיסמאות או פרטים פיננסיים.";
+
+            } else {
+                resultCard.className = "bg-cyber-800 rounded-2xl border border-green-600/60 p-6 sm:p-8 space-y-6";
+                iconBox.className = "w-16 h-16 rounded-2xl bg-green-950 border border-green-600/50 flex items-center justify-center text-3xl text-green-500";
+                icon.className = "fa-solid fa-shield-check";
+                badge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase bg-green-950 text-green-400 border border-green-600/40";
+                badge.innerText = "סטטוס: בטוח יחסית";
+                title.innerText = "לא נמצאו סממני פישינג בולטים";
+                score.innerText = riskScore + "%";
+                score.className = "text-2xl font-black text-green-500";
+
+                detectedFactors = [
+                    { title: "מבנה דומיין תקין", desc: "כתובת האתר נראית עקבית ומוכרת.", status: "safe" },
+                    { title: "היעדר מילות לחץ", desc: "לא זוהו מילות מפתח קלאסיות של הונאות פישינג.", status: "safe" },
+                    { title: "הצפנה ותקן", desc: "הקישור משתמש בתקשורת מוצפנת תקנית.", status: "safe" }
+                ];
+
+                recContainer.className = "p-4 rounded-xl border bg-green-950/40 border-green-600/50 flex items-start gap-3";
+                recIcon.className = "fa-solid fa-circle-check text-green-500 text-xl mt-0.5 shrink-0";
+                recTitle.className = "font-bold text-sm text-green-400";
+                recTitle.innerText = "הערה: שמור על ערנות תמידית";
+                recDesc.innerText = "למרות שלא זוהו סממנים זדוניים ברורים, תמיד יש להפעיל שיקול דעת ולא למסור פרטים רגישים לגורמים בלתי מוכרים.";
+            }
+
+            factors.innerHTML = detectedFactors.map(f => `
+                <div class="bg-cyber-900 p-3.5 rounded-xl border border-cyber-700 flex items-start gap-3">
+                    <i class="fa-solid ${f.status === 'danger' ? 'fa-circle-xmark text-red-500' : 'fa-circle-check text-green-500'} mt-1"></i>
+                    <div>
+                        <h5 class="font-bold text-xs text-white">${f.title}</h5>
+                        <p class="text-xs text-gray-400 mt-0.5">${f.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Academy Modals Content
+        const academyData = {
+            1: {
+                title: "מה זה פישינג (Phishing)?",
+                icon: "fa-solid fa-fish",
+                content: `
+                    <p><strong>פישינג (התחזות ברשת)</strong> היא טכניקת הנדסה חברתית הנפוצה ביותר כיום שבה תוקפים מנסים להתחזות לגופים רשמיים ואמינים (כגון בנקים, חברות אשראי, שירותי סטרימינג או חברות טכנולוגיה כמו גוגל ומיקרוסופט).</p>
+                    <p>המטרה המרכזית היא לפתות את הקורבן למסור מידע רגיש כגון סיסמאות, שמות משתמש, פרטי כרטיס אשראי או קודי אימות (OTP), על ידי שליחת הודעות דוא״ל, SMS או הפניה לאתרים מזויפים.</p>
+                    <p class="text-red-400 font-semibold">זכור: התוקפים משחקים על הרגש האנושי – פחד מפני חסימת חשבון, סקרנות, או הבטחה לזכייה בפרסים.</p>
+                `
+            },
+            2: {
+                title: "נורות אזהרה וסימנים מחשידים",
+                icon: "fa-solid fa-triangle-exclamation",
+                content: `
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>דחפות מלאכותיות:</strong> הודעות המאיימות שאם לא תפעל בתוך שעות ספורות חשבונך ייסגר.</li>
+                        <li><strong>כתובת URL מזויפת (Typosquatting):</strong> שימוש בשגיאות כתיב קלות או החלפת אותיות (למשל paypa1.com במקום paypal.com).</li>
+                        <li><strong>שגיאות כתיב ושפה לקויה:</strong> הודעות רשמיות מחברות ענק לרוב עוברות עריכה קפדנית ולא יכללו שגיאות גסות.</li>
+                        <li><strong>בקשה למסירת סיסמאות:</strong> גופים אמיתיים לעולם לא יבקשו ממך סיסמה או קוד אימות בהודעה או בשיחה.</li>
+                    </ul>
+                `
+            },
+            3: {
+                title: "סוגי פישינג מתקדמים",
+                icon: "fa-solid fa-shield-cat",
+                content: `
+                    <p><strong>ספיר פישינג (Spear Phishing):</strong> מתקפה ממוקדת היטב המותאמת אישית לאדם ספציפי או לארגון, תוך שימוש במידע שנאסף על הקורבן ברשתות חברתיות כדי ליצור אמון מלא.</p>
+                    <p><strong>סמישינג (Smishing):</strong> פישינג המבוצע באמצעות הודעות SMS או אפליקציות מסרים (כגון WhatsApp) עם קישורים זדוניים.</p>
+                    <p><strong>וישינג (Vishing):</strong> פישינג קולי שבו התוקף מתקשר בטלפון ומתחזה לנציג בנק או תמיכה טכנית כדי לדלות פרטים אישיים.</p>
+                `
+            }
+        };
+
+        function openAcademyModal(id) {
+            const data = academyData[id];
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-icon').innerHTML = `<i class="${data.icon}"></i>`;
+            document.getElementById('modal-body').innerHTML = data.content;
+            document.getElementById('academy-modal').classList.remove('hidden');
+        }
+
+        function closeAcademyModal() {
+            document.getElementById('academy-modal').classList.add('hidden');
+        }
+
+        // Authentication & Profile Logic (Gmail & Password)
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function handleAuthSubmit() {
+            const fullname = document.getElementById('auth-fullname').value.trim() || 'משתמש אבטחה';
+            const gmail = document.getElementById('auth-gmail').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+
+            if(!gmail || !gmail.endsWith('@gmail.com')) {
+                alertBox('אנא הזן כתובת Gmail תקנית (המסתיימת ב-@gmail.com).');
+                return;
+            }
+            if(!password || password.length < 4) {
+                alertBox('אנא הזן סיסמה בת לפחות 4 תווים.');
+                return;
+            }
+
+            // Save user session in localStorage simulation
+            const userData = { email: gmail, name: fullname, avatar: '' };
+            localStorage.setItem('ai_phishing_user', JSON.stringify(userData));
+
+            closeAuthModal();
+            updateAuthUI(userData);
+            alertBox(`ברוך הבא בהצלחה, ${fullname}! החשבון נשמר במערכת.`);
+        }
+
+        function updateAuthUI(user) {
+            const authBtn = document.getElementById('auth-modal-btn');
+            const profileDisplay = document.getElementById('user-profile-display');
+            const displayNameText = document.getElementById('user-display-name-text');
+            const avatarContainer = document.getElementById('user-avatar-container');
+
+            if(user && user.email) {
+                authBtn.classList.add('hidden');
+                profileDisplay.classList.remove('hidden');
+                profileDisplay.classList.add('flex');
+                displayNameText.innerText = user.name || user.email.split('@')[0];
+
+                if(user.avatar) {
+                    avatarContainer.innerHTML = `<img src="${user.avatar}" class="w-full h-full object-cover" alt="avatar">`;
+                } else {
+                    const initial = (user.name ? user.name.charAt(0) : user.email.charAt(0)).toUpperCase();
+                    avatarContainer.innerHTML = `<span id="user-avatar-initial">${initial}</span>`;
+                }
+            } else {
+                authBtn.classList.remove('hidden');
+                profileDisplay.classList.add('hidden');
+                profileDisplay.classList.remove('flex');
+            }
+        }
+
+        function openProfileSettingsModal() {
+            const savedUser = localStorage.getItem('ai_phishing_user');
+            if(!savedUser) return;
+            try {
+                const user = JSON.parse(savedUser);
+                document.getElementById('edit-fullname').value = user.name || '';
+                document.getElementById('edit-avatar-url').value = user.avatar || '';
+                document.getElementById('profile-modal-email-sub').innerText = user.email;
+
+                const preview = document.getElementById('profile-modal-avatar-preview');
+                if(user.avatar) {
+                    preview.innerHTML = `<img src="${user.avatar}" class="w-full h-full object-cover" alt="avatar" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-user\'></i>';">`;
+                } else {
+                    preview.innerHTML = `<i class="fa-solid fa-user"></i>`;
+                }
+
+                document.getElementById('profile-modal').classList.remove('hidden');
+            } catch(e) {}
+        }
+
+        function closeProfileSettingsModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        function previewAvatarInput(url) {
+            const preview = document.getElementById('profile-modal-avatar-preview');
+            const trimmed = url.trim();
+            if(trimmed) {
+                preview.innerHTML = `<img src="${trimmed}" class="w-full h-full object-cover" alt="avatar preview" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-triangle-exclamation text-red-500\'></i>';">`;
+            } else {
+                preview.innerHTML = `<i class="fa-solid fa-user"></i>`;
+            }
+        }
+
+        function selectPresetAvatar(url) {
+            document.getElementById('edit-avatar-url').value = url;
+            previewAvatarInput(url);
+        }
+
+        function saveProfileChanges() {
+            const savedUser = localStorage.getItem('ai_phishing_user');
+            if(!savedUser) return;
+            try {
+                let user = JSON.parse(savedUser);
+                user.name = document.getElementById('edit-fullname').value.trim() || user.email.split('@')[0];
+                user.avatar = document.getElementById('edit-avatar-url').value.trim();
+
+                localStorage.setItem('ai_phishing_user', JSON.stringify(user));
+                closeProfileSettingsModal();
+                updateAuthUI(user);
+                alertBox('פרטי הפרופיל ותמונת הגוגל עודכנו בהצלחה!');
+            } catch(e) {}
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('ai_phishing_user');
+            updateAuthUI(null);
+            alertBox('התנתקת מהמערכת בהצלחה.');
+        }
+
+        // Check active session on load
+        window.onload = function() {
+            loadQuizQuestion();
+            const savedUser = localStorage.getItem('ai_phishing_user');
+            if(savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    if(user && user.email) {
+                        updateAuthUI(user);
+                    }
+                } catch(e) {}
+            }
+        }
+
+        // Quiz Simulator Data & Logic
+        const quizQuestions = [
+            {
+                sender: "Security Alert &lt;service@paypa1-support-sec.com&gt;",
+                subject: "דחוף: חריגה בפעילות החשבון שלך - נדרש אימות מיידי",
+                body: "הבחנו בפעילות חשודה בחשבון ה-PayPal שלך. עליך ללחוץ על הקישור הבא ולהתחבר לאימות פרטי האשראי שלך תוך 24 שעות או שחשבונך יושעה לצמיתות.",
+                isPhishing: true,
+                explanation: "זהו פישינג ברור! שימו לב לכתובת הדומיין השגויה (paypa1), לדחיפות המוגזמת ולאיום בסגירת החשבון."
+            },
+            {
+                sender: "Google Accounts &lt;no-reply@accounts.google.com&gt;",
+                subject: "התראת אבטחה: התחברות חדשה מזוהה ממכשיר חדש",
+                body: "התחברות חדשה זוהתה לחשבון הגוגל שלך מ-Windows PC בתל אביב. אם זה אתה, אינך צריך לעשות דבר. אם לא אתה, בדוק את הפעילות באבטחת החשבון.",
+                isPhishing: false,
+                explanation: "זו הודעה לגיטימית. כתובת השולח רשמית של גוגל (accounts.google.com) וההודעה אינה דורשת ממך ללחוץ על קישור חשוד או למסור סיסמה."
+            },
+            {
+                sender: "Hapoalim Online &lt;support@bankhapoalim-secure-update.co.il&gt;",
+                subject: "מענק כספי ממשרד האוצר ממתין לחשבונך",
+                body: "לקוח יקר, זכית במענק מיוחד בסך 3,500 ש״ח לחсьון הבנק שלך. לחץ כאן להזנת פרטי כרטיס האשראי לקבלת הכסף לחשבון.",
+                isPhishing: true,
+                explanation: "זהו פישינג קלאסי! הבטחות לכספים חינם ובקשה להזנת פרטי אשראי דרך קישור במייל הן סימן מובהק להונאה."
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+
+        function loadQuizQuestion() {
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('quiz-progress').innerText = `שאלה ${currentQuizIndex + 1} מתוך ${quizQuestions.length}`;
+            document.getElementById('quiz-score-badge').innerText = `ציון: ${quizScore}`;
+            
+            const contentDiv = document.getElementById('quiz-content');
+            contentDiv.innerHTML = `
+                <div class="bg-cyber-900 rounded-xl p-4 border border-cyber-700 space-y-3">
+                    <div class="text-xs text-gray-400"><strong>מאת:</strong> ${q.sender}</div>
+                    <div class="text-sm font-bold text-white"><strong>נושא:</strong> ${q.subject}</div>
+                    <div class="text-xs text-gray-300 bg-cyber-800 p-3 rounded-lg border border-cyber-700/60">${q.body}</div>
+                </div>
+                <div class="text-sm font-semibold text-gray-300">האם הודעה זו היא פישינג או אמיתית?</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="answerQuiz(true)" class="py-4 bg-red-950/80 hover:bg-red-900 border border-red-600/50 text-red-400 font-bold rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i> פישינג / זדוני
+                    </button>
+                    <button onclick="answerQuiz(false)" class="py-4 bg-green-950/80 hover:bg-green-900 border border-green-600/50 text-green-400 font-bold rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-shield-check"></i> הודעה לגיטימית
+                    </button>
+                </div>
+            `;
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('next-quiz-btn').classList.add('hidden');
+        }
+
+        function answerQuiz(userGuess) {
+            const q = quizQuestions[currentQuizIndex];
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+
+            const isCorrect = (userGuess === q.isPhishing);
+            if(isCorrect) {
+                quizScore += 33;
+                feedback.className = "p-4 rounded-xl border bg-green-950/40 border-green-600/50 text-green-300 space-y-1";
+                feedback.innerHTML = `<h5 class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> תשובה נכונה!</h5><p class="text-xs text-gray-300">${q.explanation}</p>`;
+            } else {
+                feedback.className = "p-4 rounded-xl border bg-red-950/40 border-red-600/50 text-red-300 space-y-1";
+                feedback.innerHTML = `<h5 class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> טעות.</h5><p class="text-xs text-gray-300">${q.explanation}</p>`;
+            }
+
+            document.getElementById('quiz-score-badge').innerText = `ציון: ${Math.min(quizScore, 100)}`;
+            
+            // Hide buttons or show next
+            const nextBtn = document.getElementById('next-quiz-btn');
+            if(currentQuizIndex < quizQuestions.length - 1) {
+                nextBtn.classList.remove('hidden');
+                nextBtn.innerText = "השאלה הבאה";
+            } else {
+                nextBtn.classList.remove('hidden');
+                nextBtn.innerText = "סימת את האתגר! התחל מחדש";
+                nextBtn.onclick = function() {
+                    currentQuizIndex = 0;
+                    quizScore = 0;
+                    loadQuizQuestion();
+                };
+            }
+        }
+
+        function nextQuizQuestion() {
+            if(currentQuizIndex < quizQuestions.length - 1) {
+                currentQuizIndex++;
+                loadQuizQuestion();
+            }
+        }
+
+        // Custom non-blocking message box replacing alert()
+        function alertBox(msg) {
+            // Create custom banner notification
+            const notification = document.createElement('div');
+            notification.className = "fixed bottom-5 left-5 z-50 bg-cyber-800 border border-red-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 glow-red animate-bounce";
+            notification.innerHTML = `<i class="fa-solid fa-circle-exclamation text-red-500 text-lg"></i><span>${msg}</span>`;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize quiz on load
+        window.onload = function() {
+            loadQuizQuestion();
+        }
+    </script>
+</body>
+</html>

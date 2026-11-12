@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aptik | אפטיק - אופנה עילית אורבנית</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        aptikDark: '#080808',
+                        aptikCard: '#121212',
+                        aptikAccent: '#f5f5f5',
+                        aptikGold: '#d4af37',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080808;
+            color: #f5f5f5;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080808;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222222;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #333333;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(50%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-aptikDark text-gray-100 min-h-screen flex flex-col selection:bg-white selection:text-black">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-neutral-900 border-b border-neutral-800 text-neutral-300 text-xs py-2 px-4 overflow-hidden whitespace-nowrap text-center font-medium">
+        <span class="inline-block mx-4"><i class="fa-solid fa-truck-fast text-amber-400 ml-1"></i> משלוח מהיר חינם בהזמנות מעל ₪250</span>
+        <span class="inline-block mx-4 hidden sm:inline-block">|</span>
+        <span class="inline-block mx-4"><i class="fa-solid fa-sun text-amber-400 ml-1"></i> קולקציית קיץ 2026 זמינה כעת בדרופ בלעדי</span>
+        <span class="inline-block mx-4 hidden sm:inline-block">|</span>
+        <span class="inline-block mx-4"><i class="fa-solid fa-gift text-amber-400 ml-1"></i> 10% הנחה בקניה ראשונה</span>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 transform -translate-y-10 opacity-0 transition-all duration-300 pointer-events-none bg-white text-black px-6 py-3 rounded-full font-medium shadow-2xl flex items-center space-x-3 space-x-reverse">
+        <i class="fa-solid fa-circle-check text-green-600"></i>
+        <span id="toast-message">המוצר נוסף בהצלחה לסל הקניות</span>
+    </div>
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-40 bg-aptikDark/90 backdrop-blur-md border-b border-neutral-900 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Left Side: Mobile Menu Button & Brand Logo -->
+            <div class="flex items-center space-x-3 space-x-reverse shrink-0">
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden text-gray-300 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+
+                <div class="flex items-center space-x-2 space-x-reverse cursor-pointer whitespace-nowrap" onclick="filterCategory('all')">
+                    <span class="text-xl sm:text-2xl font-black tracking-widest text-white uppercase">APTIK</span>
+                    <span class="hidden xl:inline-block text-xs bg-neutral-900 text-neutral-400 px-2 py-0.5 rounded-full tracking-wider uppercase font-semibold border border-neutral-800">אפטיק</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links (Fixed nesting structure) -->
+            <nav class="hidden md:flex items-center space-x-4 lg:space-x-6 space-x-reverse text-xs lg:text-sm font-medium tracking-wide shrink">
+                <button onclick="filterCategory('all')" class="nav-link text-white hover:text-gray-300 transition-colors pb-1 border-b-2 border-white whitespace-nowrap px-1" data-category="all">הכל</button>
+                <div class="h-4 w-[1px] bg-neutral-800 mx-1"></div>
+                <button onclick="filterCategory('men')" class="nav-link text-neutral-400 hover:text-white transition-colors pb-1 border-b-2 border-transparent whitespace-nowrap px-1" data-category="men">גברים</button>
+                <button onclick="filterCategory('women')" class="nav-link text-neutral-400 hover:text-white transition-colors pb-1 border-b-2 border-transparent whitespace-nowrap px-1" data-category="women">נשים</button>
+                <button onclick="filterCategory('boys')" class="nav-link text-neutral-400 hover:text-white transition-colors pb-1 border-b-2 border-transparent whitespace-nowrap px-1" data-category="boys">ילדים</button>
+                <button onclick="filterCategory('girls')" class="nav-link text-neutral-400 hover:text-white transition-colors pb-1 border-b-2 border-transparent whitespace-nowrap px-1" data-category="girls">ילדות</button>
+                <div class="h-4 w-[1px] bg-neutral-800 mx-1"></div>
+                <button onclick="filterCategory('summer')" class="nav-link text-amber-400 hover:text-amber-300 transition-colors pb-1 border-b-2 border-transparent flex items-center gap-1 whitespace-nowrap px-1" data-category="summer">
+                    <i class="fa-solid fa-sun text-[10px]"></i> קולקציית קיץ
+                </button>
+                <button onclick="filterCategory('winter')" class="nav-link text-blue-400 hover:text-blue-300 transition-colors pb-1 border-b-2 border-transparent flex items-center gap-1 whitespace-nowrap px-1" data-category="winter">
+                    <i class="fa-solid fa-snowflake text-[10px]"></i> קולקציית חורף
+                </button>
+            </nav>
+
+            <!-- Right Actions (Search, Wishlist, Cart) -->
+            <div class="flex items-center space-x-2 sm:space-x-3 space-x-reverse shrink-0">
+                <div class="relative hidden lg:block">
+                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="חיפוש פריטים..." class="bg-neutral-900 border border-neutral-800 rounded-full px-3.5 py-1.5 pr-9 text-xs text-gray-200 focus:outline-none focus:border-white transition w-40 xl:w-52">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-neutral-500 text-xs"></i>
+                </div>
+                
+                <!-- Wishlist Button -->
+                <button onclick="toggleWishlistModal()" class="relative bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 p-2 sm:px-3 sm:py-2 rounded-full text-white transition flex items-center justify-center gap-1.5">
+                    <i class="fa-regular fa-heart text-sm"></i>
+                    <span class="hidden sm:inline text-xs font-medium">מועדפים</span>
+                    <span id="wishlist-badge" class="absolute -top-1 -right-1 bg-amber-400 text-black font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center scale-0 transition-transform duration-300">0</span>
+                </button>
+
+                <!-- Cart Button with prominent label -->
+                <button onclick="toggleCart()" class="relative bg-white hover:bg-neutral-200 text-black px-3.5 py-2 rounded-full transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-bag-shopping text-sm"></i>
+                    <span class="text-xs font-bold tracking-wide">סל קניות</span>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-neutral-900 text-white font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center scale-0 transition-transform duration-300">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Quick Tracker Sidebar Button -->
+        <div class="fixed right-0 top-[85%] -translate-y-1/2 z-30 hidden sm:block">
+            <button onclick="toggleTrackerModal()" class="bg-neutral-900 hover:bg-neutral-800 text-amber-400 border border-neutral-800 border-l-0 p-3 rounded-l-2xl shadow-2xl flex flex-col items-center gap-1.5 transition-all hover:pr-4 group">
+                <i class="fa-solid fa-truck-fast text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] font-bold tracking-wider [writing-mode:vertical-rl] rotate-180">איפה המשלוח שלי?</span>
+            </button>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div class="sm:hidden px-4 pb-3">
+            <div class="relative w-full">
+                <input type="text" id="mobile-search-input" oninput="handleMobileSearch()" placeholder="חיפוש פריטים באפטיק..." class="w-full bg-neutral-900 border border-neutral-800 rounded-full px-4 py-2 pr-10 text-sm text-gray-200 focus:outline-none focus:border-white">
+                <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-neutral-500 text-sm"></i>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-neutral-950 border-b border-neutral-900 px-6 py-4 space-y-3">
+            <button onclick="filterCategory('all'); toggleMobileMenu();" class="block w-full text-right py-2 text-white font-medium">הכל</button>
+            <button onclick="filterCategory('men'); toggleMobileMenu();" class="block w-full text-right py-2 text-neutral-400 font-medium">גברים</button>
+            <button onclick="filterCategory('women'); toggleMobileMenu();" class="block w-full text-right py-2 text-neutral-400 font-medium">נשים</button>
+            <button onclick="filterCategory('boys'); toggleMobileMenu();" class="block w-full text-right py-2 text-neutral-400 font-medium">ילדים</button>
+            <button onclick="filterCategory('girls'); toggleMobileMenu();" class="block w-full text-right py-2 text-neutral-400 font-medium">ילדות</button>
+            <button onclick="filterCategory('summer'); toggleMobileMenu();" class="block w-full text-right py-2 text-amber-400 font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-sun"></i> קולקציית קיץ בנפרד
+            </button>
+            <button onclick="filterCategory('winter'); toggleMobileMenu();" class="block w-full text-right py-2 text-blue-400 font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-snowflake"></i> קולקציית חורף בנפרד
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section id="hero-section" class="relative bg-neutral-950 border-b border-neutral-900 overflow-hidden py-20 md:py-28 transition-all duration-500">
+        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#e5e5e5_1px,transparent_1px)] [background-size:20px_20px]"></div>
+        <div id="hero-glow" class="absolute -top-32 -left-32 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none transition-all duration-500"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <span id="hero-badge" class="inline-flex items-center gap-2 text-xs tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3.5 py-1.5 rounded-full uppercase font-semibold mb-6 transition-all">
+                <i class="fa-solid fa-snowflake" id="hero-badge-icon"></i> <span id="hero-badge-text">קולקציית חורף יוקרתית 2026</span>
+            </span>
+            <h1 id="hero-title" class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight transition-all">
+                ביצועים חסרי פשרות. <span id="hero-title-highlight" class="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-blue-500">חורף ברמת פרימיום עילית.</span>
+            </h1>
+            <p id="hero-desc" class="max-w-2xl mx-auto text-neutral-400 text-base sm:text-lg mb-8 leading-relaxed">
+                מעטפת החורף האולטימטיבית של Aptik מחכה לך. בדים עשירים, בידוד תרמי מושלם וסטייל אורבני עוצר נשימה שלא תמצאו בשום מקום אחר.
+            </p>
+            <div id="hero-buttons" class="flex flex-wrap justify-center gap-4">
+                <button id="hero-main-btn" onclick="filterCategory('winter')" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-3.5 rounded-full transition shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-snowflake"></i> קולקציית חורף
+                </button>
+                <button onclick="openSizeFinderModal()" class="bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-800 font-semibold px-8 py-3.5 rounded-full transition shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-ruler text-amber-400"></i> מחשבון מידות חכם
+                </button>
+                <button onclick="scrollToCatalog()" class="bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-800 font-semibold px-8 py-3.5 rounded-full transition shadow-lg">
+                    לכל הפריטים
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content / Catalog Section -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        
+        <!-- Filter & Header Bar with Global Search Bar -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 border-b border-neutral-900 pb-6">
+            <div>
+                <h2 id="catalog-title" class="text-2xl font-bold tracking-tight text-white">כל הפריטים</h2>
+                <p id="catalog-count" class="text-xs text-neutral-400 mt-1">מציג מוצרים</p>
+            </div>
+
+            <!-- In-page Search Bar -->
+            <div class="relative w-full lg:w-72">
+                <input type="text" id="catalog-search-input" oninput="handleCatalogSearch()" placeholder="חיפוש חופשי בקטגוריה זו..." class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 pr-10 text-sm text-gray-200 focus:outline-none focus:border-white transition">
+                <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3.5 text-neutral-500 text-sm"></i>
+            </div>
+            
+            <!-- Sort dropdown & Size Finder Quick Button -->
+            <div class="flex flex-wrap items-center gap-3">
+                <button onclick="openSizeFinderModal()" class="text-xs bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-800 px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-ruler text-amber-400"></i> איזה מידה אני?
+                </button>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <span class="text-xs text-neutral-400">מיון לפי:</span>
+                    <select id="sort-select" onchange="sortProducts()" class="bg-neutral-900 border border-neutral-800 text-sm text-gray-200 rounded-lg px-3.5 py-2 focus:outline-none focus:border-white">
+                        <option value="featured">מומלצים</option>
+                        <option value="price-low">מחיר: נמוך לגבוה</option>
+                        <option value="price-high">מחיר: גבוה לנמוך</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Products injected via JS -->
+        </div>
+
+        <!-- Empty Search Result State -->
+        <div id="empty-state" class="hidden text-center py-24">
+            <i class="fa-solid fa-box-open text-5xl text-neutral-600 mb-4"></i>
+            <h3 class="text-xl font-bold text-white mb-2">לא נמצאו פריטים</h3>
+            <p class="text-neutral-400 text-sm mb-6">נסה לחפש מונח אחר או לבחור קטגוריה שונה</p>
+            <button onclick="resetFilters()" class="bg-white text-black px-6 py-2.5 rounded-full font-medium hover:bg-neutral-200 transition">איפוס חיפוש</button>
+        </div>
+    </main>
+
+    <!-- Shopping Cart Slide-over Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 overflow-hidden pointer-events-none">
+        <div id="cart-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none" onclick="toggleCart()"></div>
+        
+        <div class="absolute inset-y-0 left-0 max-w-full flex pl-10">
+            <div id="cart-panel" class="w-screen max-w-md bg-neutral-950 border-r border-neutral-900 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col pointer-events-auto">
+                
+                <!-- Cart Header -->
+                <div class="p-6 border-b border-neutral-900 flex items-center justify-between">
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <i class="fa-solid fa-bag-shopping text-lg"></i>
+                        <h2 class="text-lg font-bold text-white">סל קניות</h2>
+                        <span id="cart-item-count" class="bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
+                    </div>
+                    <button onclick="toggleCart()" class="text-neutral-400 hover:text-white p-2">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Cart Items List -->
+                <div id="cart-items-container" class="flex-grow overflow-y-auto p-6 space-y-4 divide-y divide-neutral-900">
+                    <!-- Dynamic cart items -->
+                </div>
+
+                <!-- Cart Footer -->
+                <div class="p-6 border-t border-neutral-900 bg-neutral-900/40">
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between text-sm text-neutral-400">
+                            <span>סכום ביניים</span>
+                            <span id="cart-subtotal">₪0</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-neutral-400">
+                            <span>משלוח מהיר</span>
+                            <span>חינם מעל ₪250</span>
+                        </div>
+                        <div class="flex justify-between text-base font-bold text-white pt-2 border-t border-neutral-900">
+                            <span>סה"כ לתשלום</span>
+                            <span id="cart-total">₪0</span>
+                        </div>
+                    </div>
+                    <button onclick="openCheckout()" id="checkout-btn" class="w-full bg-white text-black hover:bg-neutral-200 py-3.5 rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+                        מעבר לתשלום מאובטח
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Modal -->
+    <div id="wishlist-modal" class="fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="bg-neutral-950 border border-neutral-900 rounded-2xl max-w-xl w-full p-6 sm:p-8 relative shadow-2xl">
+            <button onclick="toggleWishlistModal()" class="absolute top-6 left-6 text-neutral-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-2 space-x-reverse mb-6">
+                <i class="fa-solid fa-heart text-amber-400 text-xl"></i>
+                <h3 class="text-2xl font-bold text-white">המוצרים שאהבתי</h3>
+            </div>
+            <div id="wishlist-items-container" class="space-y-4 max-h-[60vh] overflow-y-auto divide-y divide-neutral-900">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Size Finder Modal -->
+    <div id="size-finder-modal" class="fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="bg-neutral-950 border border-neutral-900 rounded-2xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl">
+            <button onclick="closeSizeFinderModal()" class="absolute top-6 left-6 text-neutral-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="mb-6">
+                <span class="text-xs uppercase bg-neutral-900 border border-neutral-800 text-amber-400 px-2.5 py-1 rounded-full font-semibold">אפטיק | עוזר מידות חכם</span>
+                <h3 class="text-2xl font-bold text-white mt-2">מחשבון מידות חכם ומתקדם</h3>
+                <p class="text-sm text-neutral-400">הזן את הגובה שלך בס"מ, בחר משקל ומבנה גוף לקבלת המלצת מידה מותאמת אישית</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-neutral-400 mb-1">הזן גובה (בס"מ)</label>
+                    <input type="number" id="sf-height-input" placeholder="לדוגמה: 175" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white" value="175">
+                </div>
+                <div>
+                    <label class="block text-xs text-neutral-400 mb-1">טווח משקל</label>
+                    <select id="sf-weight" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                        <option value="light">עד 60 ק"ג</option>
+                        <option value="medium" selected>61 - 75 ק"ג</option>
+                        <option value="heavy">76 - 90 ק"ג</option>
+                        <option value="xlarge">מעל 90 ק"ג</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-neutral-400 mb-1">מבנה גוף (חדש!)</label>
+                    <select id="sf-body-type" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                        <option value="slim">רזה / צר</option>
+                        <option value="average" selected>רגיל / מאוזן</option>
+                        <option value="broad">רחב / מלא</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-neutral-400 mb-1">איך אתה אוהב את הבגדים שלך?</label>
+                    <select id="sf-style" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                        <option value="oversize">אוברסייז רחב ואופנתי (מומלץ)</option>
+                        <option value="regular">גזרה רגילה וצמודה לגוף</option>
+                    </select>
+                </div>
+                <button onclick="calculateSize()" class="w-full bg-white text-black hover:bg-neutral-200 py-3.5 rounded-xl font-bold transition shadow-lg">
+                    מצא את המידה שלי ברגע
+                </button>
+                <div id="sf-result" class="hidden p-4 rounded-xl bg-neutral-900 border border-neutral-800 text-center">
+                    <p class="text-xs text-neutral-400">המידה המומלצת עבורך היא:</p>
+                    <p id="sf-result-text" class="text-2xl font-extrabold text-amber-400 mt-1"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="bg-neutral-950 border border-neutral-900 rounded-2xl max-w-lg w-full p-6 sm:p-8 relative shadow-2xl">
+            <button onclick="closeCheckout()" class="absolute top-6 left-6 text-neutral-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="mb-6">
+                <span class="text-xs uppercase bg-neutral-900 border border-neutral-800 text-neutral-300 px-2.5 py-1 rounded-full font-semibold">אפטיק | קופה מאובטחת</span>
+                <h3 class="text-2xl font-bold text-white mt-2">השלמת הזמנה ופרטי קונה</h3>
+                <p class="text-sm text-neutral-400">אנא מלא את פרטי הזיהוי, המשלוח והקניה הראשונה שלך</p>
+            </div>
+
+            <form id="checkout-form" onsubmit="submitOrder(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-neutral-400 mb-1">שם פרטי</label>
+                        <input type="text" id="checkout-firstname" required class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-neutral-400 mb-1">שם משפחה</label>
+                        <input type="text" id="checkout-lastname" required class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-neutral-400 mb-1">תעודת זהות (חובה)</label>
+                        <input type="text" id="checkout-idnum" required placeholder="9 ספרות" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-neutral-400 mb-1">טלפון נייד</label>
+                        <input type="tel" id="checkout-phone" required placeholder="050-0000000" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-neutral-400 mb-1">כתובת אימייל (חובה לקניה ראשונה והטבת 10%)</label>
+                    <input type="email" id="checkout-email" required placeholder="name@example.com" class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-neutral-400 mb-1">כתובת למשלוח (רחוב, מספר בית, עיר)</label>
+                    <input type="text" id="checkout-address" required class="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-white">
+                </div>
+
+                <div class="pt-4 border-t border-neutral-900">
+                    <div class="flex justify-between text-sm mb-4 font-medium text-neutral-300">
+                        <span>סכום לתשלום (כולל 10% הנחת קניה ראשונה):</span>
+                        <span id="modal-total" class="font-bold text-white text-base">₪0</span>
+                    </div>
+                    <button type="submit" class="w-full bg-white text-black hover:bg-neutral-200 py-3.5 rounded-xl font-bold transition shadow-lg">
+                        אישור ותשלום הזמנה
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Success Modal -->
+    <div id="success-modal" class="fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="bg-neutral-950 border border-neutral-900 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl">
+            <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-check text-3xl text-white"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-2">ההזמנה בוצעה בהצלחה!</h3>
+            <p class="text-sm text-neutral-400 mb-6">תודה שקנית ב-<span class="text-white font-semibold">אפטיק (Aptik)</span>. אישור נשלח לאימייל שלך ופרטי המשלוח בדרך אליך.</p>
+            <button onclick="closeSuccessModal()" class="w-full bg-white text-black hover:bg-neutral-200 py-3 rounded-xl font-bold transition">
+                חזרה לחנות
+            </button>
+        </div>
+    </div>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="bg-neutral-950 border border-neutral-900 rounded-2xl max-w-2xl w-full p-6 sm:p-8 relative shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <button onclick="closeProductModal()" class="absolute top-4 left-4 text-neutral-400 hover:text-white z-10 bg-neutral-900/80 p-2 rounded-full">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modal-product-img-container" class="aspect-square bg-neutral-900 rounded-xl overflow-hidden flex items-center justify-center">
+                <img id="modal-product-img" src="" alt="" class="w-full h-full object-cover">
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span id="modal-product-category" class="text-xs uppercase bg-neutral-900 border border-neutral-800 text-neutral-300 px-2.5 py-1 rounded-full font-medium"></span>
+                    <button id="modal-wishlist-btn" onclick="toggleModalWishlist()" class="text-neutral-400 hover:text-amber-400 text-lg transition">
+                        <i class="fa-regular fa-heart" id="modal-wishlist-icon"></i>
+                    </button>
+                </div>
+                <h3 id="modal-product-title" class="text-2xl font-bold text-white"></h3>
+                <p id="modal-product-price" class="text-xl font-semibold text-white"></p>
+                <p id="modal-product-desc" class="text-sm text-neutral-400 leading-relaxed"></p>
+                
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-xs text-neutral-400">בחר מידה:</label>
+                        <button onclick="openSizeFinderModal()" class="text-[11px] text-amber-400 hover:underline">עוזר מידות</button>
+                    </div>
+                    <div id="modal-sizes" class="flex flex-wrap gap-2">
+                        <!-- Dynamic size buttons -->
+                    </div>
+                </div>
+
+                <button onclick="addModalProductToCart()" class="w-full bg-white text-black hover:bg-neutral-200 py-3.5 rounded-xl font-bold transition shadow-lg mt-2">
+                    הוסף לסל הקניות
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Tracker Modal -->
+    <div id="tracker-modal" class="fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="bg-neutral-950 border border-neutral-900 rounded-2xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl">
+            <button onclick="toggleTrackerModal()" class="absolute top-6 left-6 text-neutral-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="mb-6">
+                <span class="text-xs uppercase bg-neutral-900 border border-neutral-800 text-amber-400 px-2.5 py-1 rounded-full font-semibold">אפטיק | מעקב משלוחים</span>
+                <h3 class="text-2xl font-bold text-white mt-2">איפה המשלוח שלי?</h3>
+                <p class="text-sm text-neutral-400">הצגת סטטוס המשלוח הפעיל שלך במערכת</p>
+            </div>
+            
+            <div id="tracker-content-container" class="space-y-4">
+                <!-- Dynamically rendered -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-neutral-950 border-t border-neutral-900 text-neutral-400 py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-4">
+                <span class="text-2xl font-black text-white tracking-widest uppercase">APTIK</span>
+                <p class="text-xs text-neutral-500 leading-relaxed">
+                    זהות עירונית. קווים נקיים. מותג האופנה והנעליים המוביל בישראל לסטייל אורבני חסר פשרות.
+                </p>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-white mb-4 uppercase tracking-wider">קהלים וקטגוריות</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><button onclick="filterCategory('men')" class="hover:text-white transition">גברים</button></li>
+                    <li><button onclick="filterCategory('women')" class="hover:text-white transition">נשים</button></li>
+                    <li><button onclick="filterCategory('boys')" class="hover:text-white transition">ילדים</button></li>
+                    <li><button onclick="filterCategory('girls')" class="hover:text-white transition">ילדות</button></li>
+                    <li><button onclick="filterCategory('summer')" class="text-amber-400 hover:text-amber-300 transition">קולקציית קיץ</button></li>
+                    <li><button onclick="filterCategory('winter')" class="text-blue-400 hover:text-blue-300 transition">קולקציית חורף</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-white mb-4 uppercase tracking-wider">שירות לקוחות</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="#" class="hover:text-white transition">מעקב משלוחים</a></li>
+                    <li><a href="#" class="hover:text-white transition">החלפות והחזרות</a></li>
+                    <li><button onclick="openSizeFinderModal()" class="hover:text-white transition">טבלת ומחשבון מידות</button></li>
+                    <li><a href="#" class="hover:text-white transition">צור קשר</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-white mb-4 uppercase tracking-wider">הישאר מעודכן</h4>
+                <p class="text-xs text-neutral-500 mb-3">הירשם לניוזלטר וקבל גישה מוקדמת לדרופים הבאים.</p>
+                <form onsubmit="subscribeNewsletter(event)" class="flex gap-2">
+                    <input type="email" required placeholder="כתובת אימייל" class="bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-white flex-grow">
+                    <button type="submit" class="bg-white text-black px-4 py-2 rounded-xl text-xs font-bold hover:bg-neutral-200 transition">הירשם</button>
+                </form>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-neutral-900 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-600">
+            <p>&copy; 2026 Aptik (אפטיק). כל הזכויות שמורות.</p>
+            <div class="flex space-x-6 space-x-reverse mt-4 sm:mt-0">
+                <a href="#" class="hover:text-white"><i class="fa-brands fa-instagram text-base"></i></a>
+                <a href="#" class="hover:text-white"><i class="fa-brands fa-tiktok text-base"></i></a>
+                <a href="#" class="hover:text-white"><i class="fa-brands fa-twitter text-base"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const products = [
+            {
+                id: 1,
+                name: 'ג\'קט פוך חורפי מבודד Aptik Pro',
+                category: 'winter',
+                target: 'men',
+                categoryName: 'קולקציית חורף',
+                price: 680,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=800',
+                description: 'מעיל פוך יוקרתי לגברים עם בידוד תרמי מתקדם, עמיד בגשם וברוחות חזקות.',
+                sizes: ['S', 'M', 'L', 'XL', 'XXL']
+            },
+            {
+                id: 2,
+                name: 'סוודר צווארון גולף שחור פרימיום',
+                category: 'winter',
+                target: 'men',
+                categoryName: 'קולקציית חורף',
+                price: 340,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&q=80&w=800',
+                description: 'סוודר צמר עדין ואיכותי לגברים בגימור אורבני מושלם.',
+                sizes: ['S', 'M', 'L', 'XL']
+            },
+            {
+                id: 3,
+                name: 'חולצת פשתן קלילה Aptik Summer',
+                category: 'summer',
+                target: 'men',
+                categoryName: 'קולקציית קיץ',
+                price: 220,
+                rating: 4.7,
+                image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=800',
+                description: 'חולצת פשתן נושמת ואוורירית במיוחד לימי הקיץ החמים.',
+                sizes: ['S', 'M', 'L', 'XL']
+            },
+            {
+                id: 4,
+                name: 'מכנסי צ\'ינו אורבניים לגברים',
+                category: 'summer',
+                target: 'men',
+                categoryName: 'קולקציית קיץ',
+                price: 290,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1473966968600-fa809b869a1b?auto=format&fit=crop&q=80&w=800',
+                description: 'מכנסי צ\'ינו בגזרה מודרנית ונוחה המותאמים ללבוש יומיומי ויוקרתי.',
+                sizes: ['30', '32', '34', '36', '38']
+            },
+            {
+                id: 5,
+                name: 'מעיל צמר ארוך נשים Aptik Classic',
+                category: 'winter',
+                target: 'women',
+                categoryName: 'קולקציית חורף',
+                price: 750,
+                rating: 5.0,
+                image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=800',
+                description: 'מעיל צמר ארוך ומרהיב לנשים המעניק מראה קלאסי, חמים ומרשים.',
+                sizes: ['XS', 'S', 'M', 'L']
+            },
+            {
+                id: 6,
+                name: 'שמלת סרוגה חורפית אלגנטית',
+                category: 'winter',
+                target: 'women',
+                categoryName: 'קולקציית חורף',
+                price: 440,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&q=80&w=800',
+                description: 'שמלת סריג יוקרתית וחמימה עם קווים נקיים וגזרה מחמיאה.',
+                sizes: ['XS', 'S', 'M', 'L']
+            },
+            {
+                id: 7,
+                name: 'סט חולצה ומכנסי פשתן קיציים לנשים',
+                category: 'summer',
+                target: 'women',
+                categoryName: 'קולקציית קיץ',
+                price: 390,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800',
+                description: 'סט פשתן מושלם לעונת הקיץ, קליל, אופנתי ונעים במיוחד על הגוף.',
+                sizes: ['XS', 'S', 'M', 'L']
+            },
+            {
+                id: 8,
+                name: 'אוברול מינימליסטי אורבני לנשים',
+                category: 'summer',
+                target: 'women',
+                categoryName: 'קולקציית קיץ',
+                price: 320,
+                rating: 4.7,
+                image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&q=80&w=800',
+                description: 'אוברול קיצי נקי עם כתפיות עדינות ונוחות מקסימלית.',
+                sizes: ['XS', 'S', 'M', 'L']
+            },
+            {
+                id: 9,
+                name: 'מעיל פוך לילדים Aptik Jr',
+                category: 'winter',
+                target: 'boys',
+                categoryName: 'קולקציית חורף',
+                price: 320,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&q=80&w=800',
+                description: 'מעיל חורף מחמם ועמיד לילדים בעיצוב ספורטיבי.',
+                sizes: ['6Y', '8Y', '10Y', '12Y']
+            },
+            {
+                id: 10,
+                name: 'קפוצ\'ון אוברסייז לילדים',
+                category: 'winter',
+                target: 'boys',
+                categoryName: 'קולקציית חורף',
+                price: 180,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1503944583260-03e551e7a336?auto=format&fit=crop&q=80&w=800',
+                description: 'קפוצ\'ון כותנה רך ומפנק לילדים לימים הקרים.',
+                sizes: ['6Y', '8Y', '10Y', '12Y']
+            },
+            {
+                id: 11,
+                name: 'סט טי-שירט ומכנסי ברמודה לילדים',
+                category: 'summer',
+                target: 'boys',
+                categoryName: 'קולקציית קיץ',
+                price: 190,
+                rating: 4.7,
+                image: 'https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?auto=format&fit=crop&q=80&w=800',
+                description: 'סט קיצי נוח וקליל לפעילות יומיומית של ילדים.',
+                sizes: ['6Y', '8Y', '10Y', '12Y']
+            },
+            {
+                id: 12,
+                name: 'מעיל פרווה סינתטית רך לילדות',
+                category: 'winter',
+                target: 'girls',
+                categoryName: 'קולקציית חורף',
+                price: 350,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=800',
+                description: 'מעיל פרווה נעים במיוחד לילדות המעניק חום ומראה מתוק.',
+                sizes: ['6Y', '8Y', '10Y', '12Y']
+            },
+            {
+                id: 13,
+                name: 'סוודר סרוג צבעוני לילדות',
+                category: 'winter',
+                target: 'girls',
+                categoryName: 'קולקציית חורף',
+                price: 210,
+                rating: 4.8,
+                image: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=800',
+                description: 'סוודר סרוג אופנתי ונעים לילדות.',
+                sizes: ['6Y', '8Y', '10Y', '12Y']
+            },
+            {
+                id: 14,
+                name: 'שמלת קיץ פרחונית לילדות',
+                category: 'summer',
+                target: 'girls',
+                categoryName: 'קולקציית קיץ',
+                price: 220,
+                rating: 4.9,
+                image: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?auto=format&fit=crop&q=80&w=800',
+                description: 'שמלת קיץ קלילה, שמחה ואוורירית לילדות.',
+                sizes: ['6Y', '8Y', '10Y', '12Y']
+            }
+        ];
+
+        let cart = [];
+        let wishlist = [];
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let catalogSearchQuery = '';
+        let currentSort = 'featured';
+        let selectedProductForModal = null;
+        let selectedSizeForModal = '';
+        let userHasActiveOrder = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            updateCartBadge();
+            updateWishlistBadge();
+        });
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.nav-link').forEach(btn => {
+                if(btn.dataset.category === category) {
+                    btn.classList.add('text-white', 'border-white');
+                    btn.classList.remove('text-neutral-400', 'border-transparent', 'text-amber-400', 'text-blue-400');
+                    if(category === 'summer') btn.classList.add('text-amber-400');
+                    if(category === 'winter') btn.classList.add('text-blue-400');
+                } else {
+                    btn.classList.remove('text-white', 'border-white', 'text-amber-400', 'text-blue-400');
+                    btn.classList.add('text-neutral-400', 'border-transparent');
+                    if(btn.dataset.category === 'summer') btn.classList.add('text-amber-400');
+                    if(btn.dataset.category === 'winter') btn.classList.add('text-blue-400');
+                }
+            });
+
+            const heroSection = document.getElementById('hero-section');
+            const heroGlow = document.getElementById('hero-glow');
+            const heroBadge = document.getElementById('hero-badge');
+            const heroBadgeIcon = document.getElementById('hero-badge-icon');
+            const heroBadgeText = document.getElementById('hero-badge-text');
+            const heroTitle = document.getElementById('hero-title');
+            const heroDesc = document.getElementById('hero-desc');
+            const heroMainBtn = document.getElementById('hero-main-btn');
+
+            if (category === 'summer') {
+                heroGlow.className = 'absolute -top-32 -left-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none transition-all duration-500';
+                heroBadge.className = 'inline-flex items-center gap-2 text-xs tracking-widest bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3.5 py-1.5 rounded-full uppercase font-semibold mb-6 transition-all';
+                heroBadgeIcon.className = 'fa-solid fa-sun';
+                heroBadgeText.innerText = 'קולקציית קיץ 2026 כבר כאן';
+                heroTitle.innerHTML = 'זהות עירונית. <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-300 to-neutral-500">קווים נקיים.</span>';
+                heroDesc.innerText = 'אפטיק (Aptik) מציגה את השילוב המושלם בין מינימליזם מודרני לבדים קלילים ונושמים לעונת הקיץ.';
+                heroMainBtn.className = 'bg-amber-400 hover:bg-amber-300 text-black font-bold px-8 py-3.5 rounded-full transition shadow-lg flex items-center gap-2';
+                heroMainBtn.innerHTML = '<i class="fa-solid fa-sun"></i> קולקציית קיץ';
+            } else if (category === 'winter') {
+                heroGlow.className = 'absolute -top-32 -left-32 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none transition-all duration-500';
+                heroBadge.className = 'inline-flex items-center gap-2 text-xs tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3.5 py-1.5 rounded-full uppercase font-semibold mb-6 transition-all';
+                heroBadgeIcon.className = 'fa-solid fa-snowflake';
+                heroBadgeText.innerText = 'קולקציית חורף יוקרתית 2026';
+                heroTitle.innerHTML = 'ביצועים חסרי פשרות. <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-blue-500">חורף ברמת פרימיום עילית.</span>';
+                heroDesc.innerText = 'מעטפת החורף האולטימטיבית של Aptik מחכה לך. בדים עשירים, בידוד תרמי מושלם וסטייל אורבני עוצר נשימה.';
+                heroMainBtn.className = 'bg-blue-500 hover:bg-blue-400 text-white font-bold px-8 py-3.5 rounded-full transition shadow-lg flex items-center gap-2';
+                heroMainBtn.innerHTML = '<i class="fa-solid fa-snowflake"></i> קולקציית חורף';
+            } else {
+                heroGlow.className = 'absolute -top-32 -left-32 w-96 h-96 bg-neutral-500/10 rounded-full blur-3xl pointer-events-none transition-all duration-500';
+                heroBadge.className = 'inline-flex items-center gap-2 text-xs tracking-widest bg-white/10 text-white border border-white/20 px-3.5 py-1.5 rounded-full uppercase font-semibold mb-6 transition-all';
+                heroBadgeIcon.className = 'fa-solid fa-star';
+                heroBadgeText.innerText = 'אופנה עילית לכל המשפחה';
+                heroTitle.innerHTML = 'זהות עירונית. <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-300 to-neutral-500">סטייל חסר פשרות.</span>';
+                heroDesc.innerText = 'הקולקציות המלאות של Aptik לגברים, נשים, ילדים וילדות עם משלוח מהיר עד הבית.';
+                heroMainBtn.className = 'bg-white text-black hover:bg-neutral-200 font-bold px-8 py-3.5 rounded-full transition shadow-lg flex items-center gap-2';
+                heroMainBtn.innerHTML = '<i class="fa-solid fa-bag-shopping"></i> קנה עכשיו';
+            }
+
+            const titles = {
+                'all': 'כל הפריטים',
+                'men': 'קולקציית גברים (Men)',
+                'women': 'קולקציית נשים (Women)',
+                'boys': 'קולקציית ילדים (Boys)',
+                'girls': 'קולקציית ילדות (Girls)',
+                'summer': 'קולקציית קיץ 2026 (Summer Drop)',
+                'winter': 'קולקציית חורף 2026 (Winter Drop)'
+            };
+            const catalogTitleEl = document.getElementById('catalog-title');
+            if (catalogTitleEl) catalogTitleEl.innerText = titles[category] || 'הקולקציה';
+
+            renderProducts();
+        }
+
+        function handleSearch() {
+            const input = document.getElementById('search-input');
+            if (input) {
+                searchQuery = input.value.trim().toLowerCase();
+                renderProducts();
+            }
+        }
+
+        function handleMobileSearch() {
+            const input = document.getElementById('mobile-search-input');
+            if (input) {
+                searchQuery = input.value.trim().toLowerCase();
+                renderProducts();
+            }
+        }
+
+        function handleCatalogSearch() {
+            const input = document.getElementById('catalog-search-input');
+            if (input) {
+                catalogSearchQuery = input.value.trim().toLowerCase();
+                renderProducts();
+            }
+        }
+
+        function sortProducts() {
+            const select = document.getElementById('sort-select');
+            if (select) {
+                currentSort = select.value;
+                renderProducts();
+            }
+        }
+
+        function resetFilters() {
+            searchQuery = '';
+            catalogSearchQuery = '';
+            const s1 = document.getElementById('search-input');
+            const s2 = document.getElementById('mobile-search-input');
+            const s3 = document.getElementById('catalog-search-input');
+            if (s1) s1.value = '';
+            if (s2) s2.value = '';
+            if (s3) s3.value = '';
+            filterCategory('all');
+        }
+
+        function renderProducts() {
+            let filtered = products.filter(product => {
+                let matchesCategory = false;
+                if (currentCategory === 'all') {
+                    matchesCategory = true;
+                } else if (currentCategory === 'summer' || currentCategory === 'winter') {
+                    matchesCategory = product.category === currentCategory;
+                } else {
+                    matchesCategory = product.target === currentCategory;
+                }
+
+                const query = searchQuery || catalogSearchQuery;
+                const matchesSearch = !query || product.name.toLowerCase().includes(query) || product.description.toLowerCase().includes(query);
+                return matchesCategory && matchesSearch;
+            });
+
+            if (currentSort === 'price-low') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (currentSort === 'price-high') {
+                filtered.sort((a, b) => b.price - a.price);
+            }
+
+            const grid = document.getElementById('product-grid');
+            const emptyState = document.getElementById('empty-state');
+            const countLabel = document.getElementById('catalog-count');
+
+            if (!grid || !emptyState || !countLabel) return;
+
+            countLabel.innerText = `מציג ${filtered.length} פריטים`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(product => {
+                const isWishlisted = wishlist.some(w => w.id === product.id);
+                const shareText = encodeURIComponent(`חייב לשתף את הפריט המטורף הזה מ-Aptik: ${product.name} ב-₪${product.price}!`);
+                const shareUrl = encodeURIComponent(window.location.href);
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${shareText}`;
+                const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+                const twitterUrl = `https://twitter.com/intent/tweet?text=${shareText}`;
+
+                return `
+                    <div class="group bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden flex flex-col transition hover:border-neutral-600 duration-300">
+                        <div class="aspect-square bg-neutral-950 overflow-hidden relative cursor-pointer" onclick="openProductModal(${product.id})">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x600/121212/ffffff?text=APTIK'">
+                            <span class="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider border border-white/10">
+                                ${product.categoryName}
+                            </span>
+                            <div class="absolute top-3 left-3 flex gap-1.5">
+                                <button onclick="event.stopPropagation(); toggleWishlist(${product.id})" class="bg-black/70 backdrop-blur-md p-2 rounded-full text-white hover:text-amber-400 transition" title="מועדפים">
+                                    <i class="${isWishlisted ? 'fa-solid text-amber-400' : 'fa-regular'} fa-heart text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 onclick="openProductModal(${product.id})" class="text-sm font-bold text-white hover:text-neutral-300 cursor-pointer transition line-clamp-1">${product.name}</h3>
+                                </div>
+                                <p class="text-xs text-neutral-400 line-clamp-2 mb-4">${product.description}</p>
+                            </div>
+
+                            <!-- Social Share Bar on Card -->
+                            <div class="flex items-center justify-between pt-3 pb-2 border-t border-neutral-800 text-neutral-400 text-xs">
+                                <span class="text-[11px]">שתף:</span>
+                                <div class="flex items-center space-x-2 space-x-reverse">
+                                    <a href="${whatsappUrl}" target="_blank" onclick="event.stopPropagation();" title="שתף בוואצאף" class="hover:text-green-400 transition"><i class="fa-brands fa-whatsapp text-sm"></i></a>
+                                    <a href="${facebookUrl}" target="_blank" onclick="event.stopPropagation();" title="שתף בפייסבוק" class="hover:text-blue-500 transition"><i class="fa-brands fa-facebook text-sm"></i></a>
+                                    <a href="${twitterUrl}" target="_blank" onclick="event.stopPropagation();" title="שתף בטוויטר/X" class="hover:text-white transition"><i class="fa-brands fa-x-twitter text-sm"></i></a>
+                                    <button onclick="event.stopPropagation(); copyProductLink('${product.name}')" title="העתק קישור" class="hover:text-amber-400 transition"><i class="fa-solid fa-link text-xs"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-3 border-t border-neutral-800">
+                                <span class="text-base font-extrabold text-white">₪${product.price}</span>
+                                <button onclick="quickAddToCart(${product.id})" class="bg-white hover:bg-neutral-200 text-black text-xs font-bold px-4 py-2 rounded-xl transition shadow">
+                                    הוסף לסל
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function quickAddToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                addToCart(product, product.sizes[0]);
+            }
+        }
+
+        function addToCart(product, size) {
+            const cartItemIndex = cart.findIndex(item => item.id === product.id && item.size === size);
+            
+            if (cartItemIndex > -1) {
+                cart[cartItemIndex].quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    size: size,
+                    quantity: 1
+                });
+            }
+
+            updateCartBadge();
+            renderCartItems();
+            showToast(`הפריט (${product.name} - מידה ${size}) נוסף לסל`);
+        }
+
+        function updateCartBadge() {
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const badge = document.getElementById('cart-badge');
+            const itemCountLabel = document.getElementById('cart-item-count');
+
+            if (itemCountLabel) itemCountLabel.innerText = totalCount;
+            if (badge) {
+                if (totalCount > 0) {
+                    badge.innerText = totalCount;
+                    badge.classList.remove('scale-0');
+                } else {
+                    badge.classList.add('scale-0');
+                }
+            }
+        }
+
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const panel = document.getElementById('cart-panel');
+            const backdrop = document.getElementById('cart-backdrop');
+
+            if (drawer && panel && backdrop) {
+                if (drawer.classList.contains('pointer-events-none')) {
+                    drawer.classList.remove('pointer-events-none');
+                    backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                    panel.classList.remove('-translate-x-full');
+                    renderCartItems();
+                } else {
+                    drawer.classList.add('pointer-events-none');
+                    backdrop.classList.add('opacity-0', 'pointer-events-none');
+                    panel.classList.add('-translate-x-full');
+                }
+            }
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items-container');
+            const subtotalEl = document.getElementById('cart-subtotal');
+            const totalEl = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            if (!container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <i class="fa-solid fa-bag-shopping text-4xl text-neutral-700 mb-3"></i>
+                        <p class="text-sm text-neutral-400">סל הקניות שלך ריק</p>
+                    </div>
+                `;
+                if (subtotalEl) subtotalEl.innerText = '₪0';
+                if (totalEl) totalEl.innerText = '₪0';
+                if (checkoutBtn) checkoutBtn.disabled = true;
+                return;
+            }
+
+            if (checkoutBtn) checkoutBtn.disabled = false;
+            let subtotal = 0;
+
+            container.innerHTML = cart.map((item, index) => {
+                subtotal += item.price * item.quantity;
+                return `
+                    <div class="flex items-center space-x-4 space-x-reverse pt-4 first:pt-0">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-xl bg-neutral-900">
+                        <div class="flex-grow">
+                            <h4 class="text-sm font-bold text-white line-clamp-1">${item.name}</h4>
+                            <div class="text-xs text-neutral-400 mt-0.5">מידה: <span class="text-white font-semibold">${item.size}</span></div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-sm font-extrabold text-white">₪${item.price * item.quantity}</span>
+                                <div class="flex items-center space-x-2 space-x-reverse bg-neutral-900 border border-neutral-800 rounded-lg px-2 py-1">
+                                    <button onclick="updateQuantity(${index}, -1)" class="text-neutral-400 hover:text-white px-1">-</button>
+                                    <span class="text-xs font-bold text-white w-4 text-center">${item.quantity}</span>
+                                    <button onclick="updateQuantity(${index}, 1)" class="text-neutral-400 hover:text-white px-1">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-neutral-500 hover:text-red-400 p-1">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            if (subtotalEl) subtotalEl.innerText = `₪${subtotal}`;
+            if (totalEl) totalEl.innerText = `₪${subtotal}`;
+        }
+
+        function updateQuantity(index, delta) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartBadge();
+            renderCartItems();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartBadge();
+            renderCartItems();
+        }
+
+        function toggleWishlist(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            const index = wishlist.findIndex(w => w.id === productId);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+                showToast(`הפריט הוסר מהמועדפים`);
+            } else {
+                wishlist.push(product);
+                showToast(`הפריט נוסף למועדפים`);
+            }
+            updateWishlistBadge();
+            renderProducts();
+            if (selectedProductForModal && selectedProductForModal.id === productId) {
+                updateModalWishlistIcon();
+            }
+        }
+
+        function toggleWishlistModal() {
+            const modal = document.getElementById('wishlist-modal');
+            if (modal) {
+                renderWishlistItems();
+                modal.classList.toggle('hidden');
+                modal.classList.toggle('flex');
+            }
+        }
+
+        function renderWishlistItems() {
+            const container = document.getElementById('wishlist-items-container');
+            if (!container) return;
+            if (wishlist.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fa-regular fa-heart text-4xl text-neutral-700 mb-3"></i>
+                        <p class="text-sm text-neutral-400">אין עדיין פריטים במועדפים</p>
+                    </div>
+                `;
+                return;
+            }
+            container.innerHTML = wishlist.map((product, idx) => `
+                <div class="flex items-center space-x-4 space-x-reverse pt-4 first:pt-0">
+                    <img src="${product.image}" alt="${product.name}" class="w-16 h-16 object-cover rounded-xl bg-neutral-900">
+                    <div class="flex-grow">
+                        <h4 class="text-sm font-bold text-white line-clamp-1">${product.name}</h4>
+                        <div class="text-sm font-extrabold text-white mt-1">₪${product.price}</div>
+                    </div>
+                    <button onclick="quickAddToCart(${product.id})" class="bg-white hover:bg-neutral-200 text-black px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                        הוסף לסל
+                    </button>
+                    <button onclick="removeFromWishlist(${idx})" class="text-neutral-500 hover:text-red-400 p-1">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeFromWishlist(index) {
+            wishlist.splice(index, 1);
+            updateWishlistBadge();
+            renderWishlistItems();
+            renderProducts();
+        }
+
+        function updateWishlistBadge() {
+            const badge = document.getElementById('wishlist-badge');
+            if (!badge) return;
+            if (wishlist.length > 0) {
+                badge.innerText = wishlist.length;
+                badge.classList.remove('scale-0');
+            } else {
+                badge.classList.add('scale-0');
+            }
+        }
+
+        function openProductModal(productId) {
+            selectedProductForModal = products.find(p => p.id === productId);
+            if (!selectedProductForModal) return;
+
+            selectedSizeForModal = selectedProductForModal.sizes[0];
+
+            document.getElementById('modal-product-img').src = selectedProductForModal.image;
+            document.getElementById('modal-product-category').innerText = selectedProductForModal.categoryName;
+            document.getElementById('modal-product-title').innerText = selectedProductForModal.name;
+            document.getElementById('modal-product-price').innerText = `₪${selectedProductForModal.price}`;
+            document.getElementById('modal-product-desc').innerText = selectedProductForModal.description;
+            updateModalWishlistIcon();
+
+            const shareText = encodeURIComponent(`חייב לשתף את הפריט המהמם הזה מ-Aptik: ${selectedProductForModal.name} ב-₪${selectedProductForModal.price}!`);
+            const shareUrl = encodeURIComponent(window.location.href);
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${shareText}`;
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${shareText}`;
+
+            const sizesContainer = document.getElementById('modal-sizes');
+            sizesContainer.innerHTML = selectedProductForModal.sizes.map((size, idx) => `
+                <button onclick="selectModalSize('${size}')" id="size-btn-${size}" class="px-4 py-2 rounded-xl text-xs font-bold border transition ${idx === 0 ? 'bg-white text-black border-white' : 'bg-neutral-900 text-neutral-300 border-neutral-800 hover:border-neutral-600'}">
+                    ${size}
+                </button>
+            `).join('');
+
+            let waBtnContainer = document.getElementById('modal-whatsapp-share');
+            if (!waBtnContainer) {
+                waBtnContainer = document.createElement('div');
+                waBtnContainer.id = 'modal-whatsapp-share';
+                sizesContainer.parentElement.parentElement.appendChild(waBtnContainer);
+            }
+            waBtnContainer.innerHTML = `
+                <div class="mt-4 pt-3 border-t border-neutral-900">
+                    <p class="text-xs text-neutral-400 mb-2">שתף פריט זה ברשתות החברתיות:</p>
+                    <div class="flex items-center gap-3">
+                        <a href="${whatsappUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-600/30 py-2 rounded-xl text-xs font-bold transition">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> וואצאף
+                        </a>
+                        <a href="${facebookUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-600/30 py-2 rounded-xl text-xs font-bold transition">
+                            <i class="fa-brands fa-facebook text-sm"></i> פייסבוק
+                        </a>
+                        <a href="${twitterUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 py-2 rounded-xl text-xs font-bold transition">
+                            <i class="fa-brands fa-x-twitter text-sm"></i> טוויטר
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            const modal = document.getElementById('product-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function copyProductLink(productName) {
+            const dummyText = `${window.location.href} - ${productName}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(dummyText).then(() => {
+                    showToast(`הקישור לפריט הועתק בהצלחה!`);
+                });
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = dummyText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast(`הקישור לפריט הועתק בהצלחה!`);
+                } catch (err) {
+                    showToast(`שגיאה בהעתקת הקישור`);
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function updateModalWishlistIcon() {
+            const icon = document.getElementById('modal-wishlist-icon');
+            if (!icon || !selectedProductForModal) return;
+            const isWishlisted = wishlist.some(w => w.id === selectedProductForModal.id);
+            if (isWishlisted) {
+                icon.className = 'fa-solid fa-heart text-amber-400';
+            } else {
+                icon.className = 'fa-regular fa-heart';
+            }
+        }
+
+        function toggleModalWishlist() {
+            if (selectedProductForModal) {
+                toggleWishlist(selectedProductForModal.id);
+            }
+        }
+
+        function selectModalSize(size) {
+            selectedSizeForModal = size;
+            if(selectedProductForModal) {
+                selectedProductForModal.sizes.forEach(s => {
+                    const btn = document.getElementById(`size-btn-${s}`);
+                    if (btn) {
+                        if (s === size) {
+                            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold border transition bg-white text-black border-white';
+                        } else {
+                            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold border transition bg-neutral-900 text-neutral-300 border-neutral-800 hover:border-neutral-600';
+                        }
+                    }
+                });
+            }
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('product-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function addModalProductToCart() {
+            if (selectedProductForModal) {
+                addToCart(selectedProductForModal, selectedSizeForModal);
+                closeProductModal();
+            }
+        }
+
+        function openSizeFinderModal() {
+            const modal = document.getElementById('size-finder-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeSizeFinderModal() {
+            const modal = document.getElementById('size-finder-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function calculateSize() {
+            const heightInput = document.getElementById('sf-height-input').value;
+            const weight = document.getElementById('sf-weight').value;
+            const bodyType = document.getElementById('sf-body-type').value;
+            const style = document.getElementById('sf-style').value;
+            const resultBox = document.getElementById('sf-result');
+            const resultText = document.getElementById('sf-result-text');
+
+            const h = parseInt(heightInput) || 175;
+            let score = h;
+            if (weight === 'light') score -= 10;
+            if (weight === 'heavy') score += 10;
+            if (weight === 'xlarge') score += 20;
+            if (bodyType === 'broad') score += 10;
+            if (bodyType === 'slim') score -= 5;
+            if (style === 'oversize') score += 10;
+
+            let recommendedSize = 'M';
+            if (score < 165) recommendedSize = 'S';
+            else if (score < 175) recommendedSize = 'M';
+            else if (score < 185) recommendedSize = 'L';
+            else recommendedSize = 'XL';
+
+            if (resultText && resultBox) {
+                resultText.innerText = `מידה ${recommendedSize} (התאמה אישית חכמה)`;
+                resultBox.classList.remove('hidden');
+            }
+        }
+
+        function openCheckout() {
+            toggleCart();
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const discountedTotal = Math.round(subtotal * 0.9);
+            const totalEl = document.getElementById('modal-total');
+            if (totalEl) totalEl.innerText = `₪${discountedTotal} (כולל 10% הנחת קניה ראשונה!)`;
+            
+            const modal = document.getElementById('checkout-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeCheckout() {
+            const modal = document.getElementById('checkout-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function submitOrder(event) {
+            event.preventDefault();
+            closeCheckout();
+
+            userHasActiveOrder = true;
+            cart = [];
+            updateCartBadge();
+
+            const successModal = document.getElementById('success-modal');
+            if (successModal) {
+                successModal.classList.remove('hidden');
+                successModal.classList.add('flex');
+            }
+        }
+
+        function closeSuccessModal() {
+            const successModal = document.getElementById('success-modal');
+            if (successModal) {
+                successModal.classList.add('hidden');
+                successModal.classList.remove('flex');
+            }
+        }
+
+        function toggleTrackerModal() {
+            const modal = document.getElementById('tracker-modal');
+            if (modal) {
+                renderTrackerContent();
+                modal.classList.toggle('hidden');
+                modal.classList.toggle('flex');
+            }
+        }
+
+        function renderTrackerContent() {
+            const container = document.getElementById('tracker-content-container');
+            if (!container) return;
+
+            if (!userHasActiveOrder) {
+                container.innerHTML = `
+                    <div class="text-center py-10 space-y-3">
+                        <i class="fa-solid fa-box-open text-4xl text-neutral-600"></i>
+                        <h4 class="text-base font-bold text-white">אין לך משלוחים פעילים כרגע</h4>
+                        <p class="text-xs text-neutral-400 leading-relaxed">לא ביצעת עדיין שום הזמנה בחנות. ברגע שתבצע רכישה, תוכל לעקוב כאן אחר מצב המשלוח בזמן אמת.</p>
+                        <button onclick="toggleTrackerModal(); scrollToCatalog();" class="mt-2 bg-white text-black hover:bg-neutral-200 px-6 py-2.5 rounded-xl text-xs font-bold transition">
+                            התחל לקנות עכשיו
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="space-y-4 pt-2">
+                        <div class="flex justify-between items-center text-xs text-neutral-400">
+                            <span>סטטוס משלוח: <strong class="text-white">פעיל</strong></span>
+                            <span class="text-amber-400 font-semibold bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">בדרכו ליעד</span>
+                        </div>
+                        
+                        <div class="space-y-2 py-2">
+                            <div class="flex justify-between text-xs text-neutral-300 font-medium">
+                                <span>התקבלה במערכת</span>
+                                <span>במרכז לוגיסטי</span>
+                                <span class="text-amber-400 font-bold">שליח בדרך אליך</span>
+                            </div>
+                            <div class="w-full bg-neutral-900 h-2 rounded-full overflow-hidden">
+                                <div class="bg-gradient-to-l from-amber-400 to-amber-600 h-full w-3/4 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-neutral-900/60 border border-neutral-900 rounded-xl p-4 space-y-2 text-xs">
+                            <div class="flex justify-between text-neutral-400">
+                                <span>מספר מעקב אישי:</span>
+                                <span class="text-white font-mono font-bold">APT-EX-94812</span>
+                            </div>
+                            <div class="flex justify-between text-neutral-400">
+                                <span>חברת שליחות:</span>
+                                <span class="text-white font-medium">Aptik Express VIP</span>
+                            </div>
+                            <div class="flex justify-between text-neutral-400">
+                                <span>הגעת משלוח משוערת:</span>
+                                <span class="text-amber-400 font-bold">היום בין 14:00 - 18:00</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-message');
+            if (!toast || !msgEl) return;
+
+            msgEl.innerText = message;
+            toast.classList.remove('opacity-0', '-translate-y-10');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-10');
+            }, 3000);
+        }
+
+        function subscribeNewsletter(event) {
+            event.preventDefault();
+            showToast('נרשמת בהצלחה לניוזלטר של אפטיק! קוד הנחת קניה ראשונה הופעל.');
+            event.target.reset();
+        }
+
+        function scrollToCatalog() {
+            window.scrollTo({
+                top: window.innerHeight * 0.7,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>

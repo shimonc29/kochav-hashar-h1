@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>20 שלבי האבירים - מרוץ האבירים האפי</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Rubik -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: radial-gradient(circle at center, #311042 0%, #090514 100%);
+            user-select: none;
+            overflow-x: hidden;
+        }
+        canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        .retro-shadow {
+            text-shadow: 0 0 15px rgba(236, 72, 153, 0.7), 3px 3px 0px #000;
+        }
+        .neon-box {
+            box-shadow: 0 0 35px rgba(236, 72, 153, 0.4), inset 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white flex flex-col items-center justify-center p-2 md:p-4">
+
+    <!-- כותרת ראשית -->
+    <header class="mb-3 text-center">
+        <h1 class="text-3xl md:text-5xl font-900 text-pink-400 tracking-wider retro-shadow mb-1">⚔️ מרוץ האבירים: 20 שלבים</h1>
+        <p class="text-indigo-200 text-xs md:text-base">במצב 2 שחקנים: <strong>מי שמגיע ראשון לדלת מנצח בשלב!</strong> בשחקן יחיד: אספו גבישים ומפתח!</p>
+    </header>
+
+    <!-- קונטיינר המשחק -->
+    <div class="relative w-full max-w-4xl bg-slate-950 border-4 border-pink-500/80 rounded-2xl overflow-hidden neon-box shadow-2xl">
+        
+        <!-- שכבת ממשק עליונה (HUD) -->
+        <div id="hud" class="absolute top-0 left-0 w-full bg-slate-950/90 backdrop-blur-md px-4 py-2 flex flex-wrap justify-between items-center border-b border-pink-500/40 z-10 text-xs md:text-sm font-bold">
+            <div class="flex items-center gap-3">
+                <span class="text-pink-400">שלב: <span id="hud-level" class="text-white">1</span> / 20</span>
+                <span class="text-cyan-400 flex items-center gap-1">🛡️ P1: <span id="hud-p1-lives" class="text-white">3</span></span>
+                <span id="hud-p2-container" class="text-emerald-400 flex items-center gap-1 hidden">⚔️ P2: <span id="hud-p2-lives" class="text-white">3</span></span>
+            </div>
+            <div id="hud-objective-container" class="flex items-center gap-4">
+                <span id="hud-crystals-wrap" class="text-cyan-400">💎 גבישים: <span id="hud-crystals" class="text-white">0</span>/<span id="hud-total-crystals" class="text-white">3</span></span>
+                <span id="hud-key-status" class="text-gray-500 flex items-center gap-1">🔑 מפתח: <span id="hud-key" class="text-red-400">חסר</span></span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-amber-400">ניקוד: <span id="hud-score" class="text-white">0</span></span>
+                <span class="text-purple-400">שיא: <span id="hud-highscore" class="text-white">0</span></span>
+            </div>
+        </div>
+
+        <!-- קנבס המשחק -->
+        <canvas id="gameCanvas" width="900" height="500" class="w-full h-auto block bg-slate-950 cursor-default"></canvas>
+
+        <!-- מסך תפריט ראשי / פתיחה -->
+        <div id="screen-start" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-20 transition-all duration-300">
+            <div class="max-w-md bg-slate-900 border-2 border-pink-500/60 rounded-2xl p-6 shadow-2xl">
+                <div class="text-5xl mb-3">🛡️🏁⚔️</div>
+                <h2 class="text-2xl md:text-3xl font-900 text-pink-400 mb-2">מרוץ 20 שלבי האבירים</h2>
+                <p class="text-slate-300 text-xs md:text-sm mb-4 leading-relaxed">
+                    מסע זוהר ועתידני בן 20 שלבים חדשים לגמרי! במצב שני שחקנים זוהי <strong>תחרות ראש בראש</strong> – מי שמגיע ראשון לדלת מנצח בשלב!
+                </p>
+                
+                <!-- בחירת מצב משחק -->
+                <div class="mb-5">
+                    <label class="block text-xs font-bold text-slate-400 mb-2">בחר מצב משחק:</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="btn-mode-1p" onclick="setGameMode(1)" class="py-2.5 px-4 rounded-xl font-bold border-2 border-pink-500 bg-pink-600/30 text-pink-300 transition-all text-sm">
+                            👤 שחקן יחיד (הרפתקה)
+                        </button>
+                        <button id="btn-mode-2p" onclick="setGameMode(2)" class="py-2.5 px-4 rounded-xl font-bold border-2 border-slate-700 bg-slate-800 text-slate-300 transition-all text-sm">
+                            🏁 שני שחקנים (מרוץ!)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="controls-hint" class="bg-slate-800/80 p-3 rounded-xl mb-5 text-right text-xs text-slate-300 space-y-1.5 border border-slate-700">
+                    <p><strong class="text-cyan-400">שחקן 1 (כחול):</strong> מקשי A / D לתזוזה, W או Space לקפיצה כפולה.</p>
+                </div>
+
+                <button onclick="startGame()" class="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-900 rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95 text-sm md:text-base">
+                    התחל במסע (20 שלבים)
+                </button>
+            </div>
+        </div>
+
+        <!-- מסך מעבר שלב / מנצח במרוץ -->
+        <div id="screen-level-complete" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center z-20">
+            <div class="max-w-md bg-slate-900 border-2 border-pink-500/60 rounded-2xl p-8 shadow-2xl">
+                <div id="level-complete-emoji" class="text-6xl mb-4">🏆</div>
+                <h2 id="level-complete-title" class="text-3xl font-900 text-pink-400 mb-2">השלב הושלם!</h2>
+                <p id="level-complete-text" class="text-slate-300 text-sm mb-6">עברתם לשלב הבא בהצלחה.</p>
+                <button onclick="nextLevel()" class="w-full py-3.5 bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-900 rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+                    המשך לשלב הבא
+                </button>
+            </div>
+        </div>
+
+        <!-- מסך ניצחון במשחק / במרוץ הכולל -->
+        <div id="screen-victory" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center z-20">
+            <div class="max-w-md bg-slate-900 border-2 border-amber-500/60 rounded-2xl p-8 shadow-2xl">
+                <div class="text-6xl mb-4">👑</div>
+                <h2 id="victory-main-title" class="text-3xl font-900 text-amber-400 mb-2">כל הכבוד! סיימתם את כל 20 השלבים!</h2>
+                <p id="victory-sub-text" class="text-slate-300 text-sm mb-4">הוכחתם גבורה עילאית במסע הזוהר!</p>
+                <div class="bg-slate-800 p-4 rounded-xl mb-6 text-center">
+                    <p class="text-slate-400 text-xs">תוצאה סופית:</p>
+                    <p id="final-score" class="text-3xl font-900 text-amber-400">0</p>
+                </div>
+                <button onclick="returnToMenu()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-400 hover:to-pink-400 text-slate-950 font-900 rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+                    חזרה לתפריט הראשי
+                </button>
+            </div>
+        </div>
+
+        <!-- מסך הפסד (Game Over) -->
+        <div id="screen-gameover" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-6 text-center z-20">
+            <div class="max-w-md bg-slate-900 border-2 border-red-500/60 rounded-2xl p-8 shadow-2xl">
+                <div class="text-6xl mb-4">💀</div>
+                <h2 class="text-3xl font-900 text-red-500 mb-2">נגמרו החיים</h2>
+                <p class="text-slate-300 text-sm mb-6">אל תותרו, נסו שוב את האתגר מחדש!</p>
+                <button onclick="restartGame()" class="w-full py-3.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-900 rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+                    נסו שוב
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- הוראות שליטה תחתונות -->
+    <div class="mt-3 text-center text-xs text-indigo-300">
+        שחקן 1 (כחול): A/D הליכה, W/Space קפיצה | שחקן 2 (ירוק): חצים ⬅️ ➡️ הליכה, ⬆️ קפיצה.
+    </div>
+
+    <!-- סקריפט המשחק המעודכן עם רקע זוהר ושלבי מרוץ חדשים -->
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // ניהול מצבי המשחק
+        let gameState = "START"; // START, PLAYING, LEVEL_COMPLETE, VICTORY, GAMEOVER
+        let score = 0;
+        let highScore = localStorage.getItem("knight_race_highscore") || 0;
+        let currentLevel = 1;
+        let playerCount = 1; // 1 או 2 שחקנים
+        const MAX_LEVELS = 20;
+
+        // ניקוד מרוץ ל-2 שחקנים (כמה שלבים כל אחד ניצח)
+        let p1RaceWins = 0;
+        let p2RaceWins = 0;
+
+        // מידע שחקן 1 (כחול ניאון)
+        const player1 = {
+            x: 40, y: 350, width: 28, height: 40,
+            vx: 0, vy: 0, speed: 5, jumpPower: -11.5, gravity: 0.55,
+            grounded: false, jumpsLeft: 2, facingRight: true, invulnerableTime: 0, lives: 3
+        };
+
+        // מידע שחקן 2 (ירוק ניאון)
+        const player2 = {
+            x: 80, y: 350, width: 28, height: 40,
+            vx: 0, vy: 0, speed: 5, jumpPower: -11.5, gravity: 0.55,
+            grounded: false, jumpsLeft: 2, facingRight: true, invulnerableTime: 0, lives: 3
+        };
+
+        // מצב מקשים
+        const keys = {
+            p1_right: false, p1_left: false, p1_up: false,
+            p2_right: false, p2_left: false, p2_up: false
+        };
+
+        // אובייקטי שלב
+        let platforms = [];
+        let movingPlatforms = [];
+        let hazards = []; // לבה, קוצים ניאון
+        let bouncePads = []; // משטחי קפיצה זוהרים
+        let crystals = [];
+        let enemies = [];
+        let keyItem = null;
+        let door = null;
+        let particles = [];
+        let bgStars = [];
+
+        // יצירת כוכבים רקע זוהרים
+        for(let i=0; i<60; i++) {
+            bgStars.push({
+                x: Math.random() * 900,
+                y: Math.random() * 500,
+                radius: Math.random() * 2 + 0.5,
+                alpha: Math.random() * 0.7 + 0.3,
+                pulse: Math.random() * 0.05
+            });
+        }
+
+        // Web Audio API לסאונד אפקטים זוהרים
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === "jump") {
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(450, now + 0.12);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === "crystal") {
+                    osc.type = "triangle";
+                    osc.frequency.setValueAtTime(659.25, now);
+                    osc.frequency.setValueAtTime(987.77, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === "hit") {
+                    osc.type = "sawtooth";
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.linearRampToValueAtTime(50, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === "win") {
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.12);
+                    osc.frequency.setValueAtTime(783.99, now + 0.24);
+                    osc.frequency.setValueAtTime(1046.50, now + 0.36);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+                }
+            } catch (e) {}
+        }
+
+        function setGameMode(mode) {
+            playerCount = mode;
+            const btn1 = document.getElementById("btn-mode-1p");
+            const btn2 = document.getElementById("btn-mode-2p");
+            const hint = document.getElementById("controls-hint");
+            const crystalsWrap = document.getElementById("hud-crystals-wrap");
+            const keyStatus = document.getElementById("hud-key-status");
+
+            if (mode === 1) {
+                btn1.className = "py-2.5 px-4 rounded-xl font-bold border-2 border-pink-500 bg-pink-600/30 text-pink-300 transition-all text-sm";
+                btn2.className = "py-2.5 px-4 rounded-xl font-bold border-2 border-slate-700 bg-slate-800 text-slate-300 transition-all text-sm";
+                hint.innerHTML = `<p><strong class="text-cyan-400">שחקן 1 (כחול):</strong> מקשי A / D לתזוזה, W או Space לקפיצה כפולה.</p>`;
+                crystalsWrap.classList.remove("hidden");
+                keyStatus.classList.remove("hidden");
+            } else {
+                btn2.className = "py-2.5 px-4 rounded-xl font-bold border-2 border-emerald-500 bg-emerald-600/30 text-emerald-300 transition-all text-sm";
+                btn1.className = "py-2.5 px-4 rounded-xl font-bold border-2 border-slate-700 bg-slate-800 text-slate-300 transition-all text-sm";
+                hint.innerHTML = `
+                    <p><strong class="text-cyan-400">שחקן 1 (כחול):</strong> A / D לתזוזה, W/Space לקפיצה.</p>
+                    <p><strong class="text-emerald-400">שחקן 2 (ירוק):</strong> חצים ⬅️ ➡️ לתזוזה, ⬆️ לקפיצה.</p>
+                `;
+                // במרוץ 2 שחקנים הדלת פתוחה תמיד - מי שמגיע ראשון מנצח!
+                crystalsWrap.classList.add("hidden");
+                keyStatus.classList.add("hidden");
+            }
+        }
+
+        document.getElementById("hud-highscore").innerText = highScore;
+
+        // האזנה למקשים
+        window.addEventListener("keydown", (e) => {
+            initAudio();
+            if (e.code === "KeyD") keys.p1_right = true;
+            if (e.code === "KeyA") keys.p1_left = true;
+            if (e.code === "KeyW" || e.code === "Space") {
+                if (!keys.p1_up) jumpPlayer(player1);
+                keys.p1_up = true;
+                if (e.code === "Space") e.preventDefault();
+            }
+
+            if (playerCount === 2) {
+                if (e.code === "ArrowRight") keys.p2_right = true;
+                if (e.code === "ArrowLeft") keys.p2_left = true;
+                if (e.code === "ArrowUp") {
+                    if (!keys.p2_up) jumpPlayer(player2);
+                    keys.p2_up = true;
+                    e.preventDefault();
+                }
+            }
+        });
+
+        window.addEventListener("keyup", (e) => {
+            if (e.code === "KeyD") keys.p1_right = false;
+            if (e.code === "KeyA") keys.p1_left = false;
+            if (e.code === "KeyW" || e.code === "Space") keys.p1_up = false;
+
+            if (e.code === "ArrowRight") keys.p2_right = false;
+            if (e.code === "ArrowLeft") keys.p2_left = false;
+            if (e.code === "ArrowUp") keys.p2_up = false;
+        });
+
+        function jumpPlayer(p) {
+            if (gameState !== "PLAYING") return;
+            if (p.grounded) {
+                p.vy = p.jumpPower;
+                p.grounded = false;
+                p.jumpsLeft = 1;
+                playSound("jump");
+                createParticles(p.x + p.width/2, p.y + p.height, "#38bdf8", 6);
+            } else if (p.jumpsLeft > 0) {
+                p.vy = p.jumpPower * 0.9;
+                p.jumpsLeft = 0;
+                playSound("jump");
+                createParticles(p.x + p.width/2, p.y + p.height, "#ec4899", 6);
+            }
+        }
+
+        function createParticles(x, y, color, count) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    radius: Math.random() * 3 + 1,
+                    color: color,
+                    life: 25
+                });
+            }
+        }
+
+        // מחולל 20 שלבים חדשים לגמרי בעיצוב ניאון / זוהר
+        function loadLevel(lvl) {
+            currentLevel = lvl;
+            platforms = [];
+            movingPlatforms = [];
+            hazards = [];
+            bouncePads = [];
+            crystals = [];
+            enemies = [];
+            particles = [];
+
+            // מיקום התחלה לשחקנים
+            player1.x = 35; player1.y = 350; player1.vx = 0; player1.vy = 0; player1.invulnerableTime = 60;
+            player2.x = 75; player2.y = 350; player2.vx = 0; player2.vy = 0; player2.invulnerableTime = 60;
+
+            if (lvl === 1) {
+                // שלב 1: מדרגות ניאון קלילות (שלב החרב / פתיחה)
+                platforms.push({ x: 0, y: 440, width: 900, height: 60, color: "#1e1b4b" });
+                platforms.push({ x: 180, y: 350, width: 130, height: 16, color: "#3b82f6" });
+                platforms.push({ x: 380, y: 270, width: 130, height: 16, color: "#6366f1" });
+                platforms.push({ x: 580, y: 190, width: 130, height: 16, color: "#8b5cf6" });
+
+                crystals.push({ x: 230, y: 310, width: 16, height: 20, collected: false });
+                crystals.push({ x: 430, y: 230, width: 16, height: 20, collected: false });
+                crystals.push({ x: 630, y: 150, width: 16, height: 20, collected: false });
+
+                keyItem = { x: 640, y: 150, width: 20, height: 20, collected: false };
+                door = { x: 820, y: 360, width: 35, height: 80, open: (playerCount === 2) };
+            } else {
+                // שלבים 2 עד 20: עיצוב דינמי, לבה זוהרת, משטחי קפיצה ניאון, פלטפורמות נעות ואויבים
+                let hasPit = lvl >= 3;
+                let pitStart = 240 + (lvl * 11) % 120;
+                let pitWidth = Math.min(120 + (lvl * 6), 340);
+
+                if (hasPit) {
+                    platforms.push({ x: 0, y: 440, width: pitStart, height: 60, color: "#1e1b4b" });
+                    platforms.push({ x: pitStart + pitWidth, y: 440, width: 900 - (pitStart + pitWidth), height: 60, color: "#1e1b4b" });
+                    hazards.push({ x: pitStart, y: 470, width: pitWidth, height: 30, type: "lava" });
+                } else {
+                    platforms.push({ x: 0, y: 440, width: 900, height: 60, color: "#1e1b4b" });
+                }
+
+                // פלטפורמות בהתאם לשלב
+                let platCount = Math.min(3 + Math.floor(lvl / 2), 7);
+                for (let i = 0; i < platCount; i++) {
+                    let px = 80 + (i * 125 + lvl * 15) % 720;
+                    let py = 340 - ((i * 45 + lvl * 5) % 230);
+                    let pw = Math.max(70, 150 - (lvl * 2));
+                    
+                    if (lvl >= 3 && i % 2 === 1) {
+                        let speed = 1.2 + (lvl * 0.08);
+                        movingPlatforms.push({
+                            x: px, y: py, width: pw, height: 16,
+                            minX: Math.max(20, px - 90), maxX: Math.min(860, px + 90),
+                            vx: speed, dir: 1
+                        });
+                    } else {
+                        platforms.push({ x: px, y: py, width: pw, height: 16, color: i % 2 === 0 ? "#3b82f6" : "#ec4899" });
+                    }
+                }
+
+                // משטחי קפיצה זוהרים
+                if (lvl >= 4) {
+                    bouncePads.push({ x: 150, y: 424, width: 50, height: 16 });
+                    if (lvl >= 10) bouncePads.push({ x: 520, y: 424, width: 50, height: 16 });
+                }
+
+                // קוצי ניאון
+                if (lvl >= 5) {
+                    hazards.push({ x: 340, y: 426, width: 70, height: 14, type: "spikes" });
+                    if (lvl >= 12) hazards.push({ x: 230, y: 216, width: 60, height: 14, type: "spikes" });
+                }
+
+                // גבישים (במצב יחיד)
+                let crystalCount = Math.min(3 + Math.floor(lvl / 5), 5);
+                for (let c = 0; c < crystalCount; c++) {
+                    crystals.push({
+                        x: 120 + c * 155,
+                        y: 90 + (c % 2) * 130,
+                        width: 16, height: 20, collected: false
+                    });
+                }
+
+                // אויבי ניאון זזים
+                let enemyCount = Math.min(1 + Math.floor(lvl / 3), 4);
+                for (let e = 0; e < enemyCount; e++) {
+                    enemies.push({
+                        x: 170 + e * 190,
+                        y: 405,
+                        width: 28, height: 35,
+                        vx: 1.2 + (lvl * 0.08),
+                        minX: 70 + e * 160,
+                        maxX: 280 + e * 160,
+                        alive: true
+                    });
+                }
+
+                keyItem = { x: 710 + (lvl % 5) * 25, y: 60, width: 20, height: 20, collected: false };
+                door = { x: 830, y: 360, width: 35, height: 80, open: (playerCount === 2) };
+            }
+
+            updateHUD();
+        }
+
+        function startGame() {
+            score = 0;
+            p1RaceWins = 0;
+            p2RaceWins = 0;
+            player1.lives = 3;
+            player2.lives = 3;
+            document.getElementById("screen-start").classList.add("hidden");
+            document.getElementById("screen-gameover").classList.add("hidden");
+            document.getElementById("screen-victory").classList.add("hidden");
+            document.getElementById("screen-level-complete").classList.add("hidden");
+            loadLevel(1);
+            gameState = "PLAYING";
+        }
+
+        function nextLevel() {
+            document.getElementById("screen-level-complete").classList.add("hidden");
+            if (currentLevel < MAX_LEVELS) {
+                loadLevel(currentLevel + 1);
+                gameState = "PLAYING";
+            } else {
+                playSound("win");
+                document.getElementById("final-score").innerText = score;
+                
+                let winTitle = "כל הכבוד! סיימתם את כל 20 השלבים!";
+                let subText = "הוכחתם גבורה עילאית במסע הזוהר!";
+                if (playerCount === 2) {
+                    if (p1RaceWins > p2RaceWins) {
+                        winTitle = "🏆 שחקן 1 ניצח במרוץ הכולל!";
+                        subText = `שחקן 1 ניצח ב-${p1RaceWins} שלבים מתוך ${MAX_LEVELS}!`;
+                    } else if (p2RaceWins > p1RaceWins) {
+                        winTitle = "🏆 שחקן 2 ניצח במרוץ הכולל!";
+                        subText = `שחקן 2 ניצח ב-${p2RaceWins} שלבים מתוך ${MAX_LEVELS}!`;
+                    } else {
+                        winTitle = "🤝 תיקו מוחלט במרוץ!";
+                        subText = "ששני האבירים הגיעו לתוצאה שווה!";
+                    }
+                }
+                document.getElementById("victory-main-title").innerText = winTitle;
+                document.getElementById("victory-sub-text").innerText = subText;
+                document.getElementById("screen-victory").classList.remove("hidden");
+                gameState = "VICTORY";
+            }
+        }
+
+        function returnToMenu() {
+            document.getElementById("screen-victory").classList.add("hidden");
+            document.getElementById("screen-gameover").classList.add("hidden");
+            document.getElementById("screen-start").classList.remove("hidden");
+            gameState = "START";
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
+        function updateHUD() {
+            document.getElementById("hud-level").innerText = currentLevel;
+            document.getElementById("hud-p1-lives").innerText = player1.lives;
+            
+            const p2Container = document.getElementById("hud-p2-container");
+            if (playerCount === 2) {
+                p2Container.classList.remove("hidden");
+                document.getElementById("hud-p2-lives").innerText = player2.lives;
+            } else {
+                p2Container.classList.add("hidden");
+            }
+            
+            if (playerCount === 1) {
+                const totalCrystals = crystals.length;
+                const collectedCrystals = crystals.filter(c => c.collected).length;
+                document.getElementById("hud-crystals").innerText = collectedCrystals;
+                document.getElementById("hud-total-crystals").innerText = totalCrystals;
+
+                const hasKey = keyItem && keyItem.collected;
+                const keyEl = document.getElementById("hud-key");
+                const keyStatusEl = document.getElementById("hud-key-status");
+                if (hasKey) {
+                    keyEl.innerText = "נאסף!";
+                    keyStatusEl.className = "text-emerald-400 flex items-center gap-1";
+                } else {
+                    keyEl.innerText = "חסר";
+                    keyStatusEl.className = "text-gray-500 flex items-center gap-1";
+                }
+            }
+
+            document.getElementById("hud-score").innerText = score;
+        }
+
+        function damagePlayer(p) {
+            if (p.invulnerableTime > 0) return;
+            p.lives--;
+            p.invulnerableTime = 90;
+            playSound("hit");
+            updateHUD();
+
+            let activePlayersDead = (playerCount === 1) ? (player1.lives <= 0) : (player1.lives <= 0 && player2.lives <= 0);
+
+            if (activePlayersDead) {
+                gameState = "GAMEOVER";
+                document.getElementById("screen-gameover").classList.remove("hidden");
+            }
+        }
+
+        function updatePlayerPhysics(p) {
+            p.x += p.vx;
+            if (p.x < 0) p.x = 0;
+            if (p.x + p.width > canvas.width) p.x = canvas.width - p.width;
+
+            p.vy += p.gravity;
+            p.y += p.vy;
+            p.grounded = false;
+
+            platforms.forEach(pl => {
+                if (
+                    p.x < pl.x + pl.width &&
+                    p.x + p.width > pl.x &&
+                    p.y + p.height > pl.y &&
+                    p.y + p.height - p.vy <= pl.y + 6 &&
+                    p.vy >= 0
+                ) {
+                    p.y = pl.y - p.height;
+                    p.vy = 0;
+                    p.grounded = true;
+                    p.jumpsLeft = 2;
+                }
+            });
+
+            movingPlatforms.forEach(mp => {
+                if (
+                    p.x < mp.x + mp.width &&
+                    p.x + p.width > mp.x &&
+                    p.y + p.height > mp.y &&
+                    p.y + p.height - p.vy <= mp.y + 6 &&
+                    p.vy >= 0
+                ) {
+                    p.y = mp.y - p.height;
+                    p.vy = 0;
+                    p.grounded = true;
+                    p.jumpsLeft = 2;
+                    p.x += mp.vx * mp.dir;
+                }
+            });
+
+            bouncePads.forEach(bp => {
+                if (
+                    p.x < bp.x + bp.width &&
+                    p.x + p.width > bp.x &&
+                    p.y + p.height > bp.y &&
+                    p.y + p.height - p.vy <= bp.y + 8 &&
+                    p.vy >= 0
+                ) {
+                    p.vy = -14.5;
+                    p.grounded = false;
+                    playSound("jump");
+                    createParticles(p.x + p.width/2, bp.y, "#f43f5e", 10);
+                }
+            });
+
+            hazards.forEach(h => {
+                if (
+                    p.x + p.width > h.x &&
+                    p.x < h.x + h.width &&
+                    p.y + p.height > h.y &&
+                    p.y < h.y + h.height
+                ) {
+                    damagePlayer(p);
+                    p.vy = -8;
+                }
+            });
+
+            if (p.y > canvas.height) {
+                damagePlayer(p);
+                p.x = 40;
+                p.y = 200;
+                p.vy = 0;
+            }
+        }
+
+        function update() {
+            if (gameState !== "PLAYING") return;
+
+            if (player1.invulnerableTime > 0) player1.invulnerableTime--;
+            if (player2.invulnerableTime > 0) player2.invulnerableTime--;
+
+            // תנועת שחקן 1
+            player1.vx = 0;
+            if (keys.p1_right) { player1.vx = player1.speed; player1.facingRight = true; }
+            if (keys.p1_left) { player1.vx = -player1.speed; player1.facingRight = false; }
+            if (player1.lives > 0) updatePlayerPhysics(player1);
+
+            // תנועת שחקן 2
+            if (playerCount === 2) {
+                player2.vx = 0;
+                if (keys.p2_right) { player2.vx = player2.speed; player2.facingRight = true; }
+                if (keys.p2_left) { player2.vx = -player2.speed; player2.facingRight = false; }
+                if (player2.lives > 0) updatePlayerPhysics(player2);
+            }
+
+            movingPlatforms.forEach(mp => {
+                mp.x += mp.vx * mp.dir;
+                if (mp.x < mp.minX || mp.x + mp.width > mp.maxX) {
+                    mp.dir *= -1;
+                }
+            });
+
+            // איסוף גבישים (במצב שחקן יחיד)
+            if (playerCount === 1) {
+                crystals.forEach(c => {
+                    if (player1.lives > 0 && !c.collected &&
+                        player1.x < c.x + c.width &&
+                        player1.x + player1.width > c.x &&
+                        player1.y < c.y + c.height &&
+                        player1.y + player1.height > c.y
+                    ) {
+                        c.collected = true;
+                        score += 100;
+                        playSound("crystal");
+                        updateHUD();
+                        createParticles(c.x + c.width/2, c.y + c.height/2, "#38bdf8", 6);
+                    }
+                });
+
+                if (keyItem && !keyItem.collected) {
+                    if (player1.lives > 0 &&
+                        player1.x < keyItem.x + keyItem.width &&
+                        player1.x + player1.width > keyItem.x &&
+                        player1.y < keyItem.y + keyItem.height &&
+                        player1.y + player1.height > keyItem.y
+                    ) {
+                        keyItem.collected = true;
+                        score += 250;
+                        playSound("crystal");
+                        if (score > highScore) {
+                            highScore = score;
+                            localStorage.setItem("knight_race_highscore", highScore);
+                            document.getElementById("hud-highscore").innerText = highScore;
+                        }
+                        updateHUD();
+                    }
+                }
+            }
+
+            // אויבים
+            enemies.forEach(en => {
+                if (!en.alive) return;
+                en.x += en.vx;
+                if (en.x < en.minX || en.x + en.width > en.maxX) {
+                    en.vx *= -1;
+                }
+
+                let activePlayers = playerCount === 2 ? [player1, player2] : [player1];
+                activePlayers.forEach(p => {
+                    if (p.lives > 0 &&
+                        p.x < en.x + en.width &&
+                        p.x + p.width > en.x &&
+                        p.y < en.y + en.height &&
+                        p.y + p.height > en.y
+                    ) {
+                        if (p.vy > 0 && p.y + p.height - p.vy <= en.y + 12) {
+                            en.alive = false;
+                            p.vy = -7;
+                            score += 150;
+                            playSound("jump");
+                            updateHUD();
+                        } else {
+                            damagePlayer(p);
+                        }
+                    }
+                });
+            });
+
+            // דלת יציאה / מרוץ
+            if (door) {
+                if (playerCount === 1) {
+                    const allCrystals = crystals.every(c => c.collected);
+                    const hasKey = keyItem && keyItem.collected;
+                    if (allCrystals && hasKey) door.open = true;
+
+                    if (door.open && player1.lives > 0 &&
+                        player1.x < door.x + door.width &&
+                        player1.x + player1.width > door.x &&
+                        player1.y < door.y + door.height &&
+                        player1.y + player1.height > door.y
+                    ) {
+                        gameState = "LEVEL_COMPLETE";
+                        score += 300;
+                        playSound("win");
+                        document.getElementById("level-complete-emoji").innerText = "🎉";
+                        document.getElementById("level-complete-title").innerText = `שלב ${currentLevel} הושלם!`;
+                        document.getElementById("level-complete-text").innerText = `כל הכבוד! עברתם לשלב הבא. בונוס 300 נקודות.`;
+                        document.getElementById("screen-level-complete").classList.remove("hidden");
+                    }
+                } else {
+                    // מצב 2 שחקנים - מרוץ! מי שמגיע ראשון לדלת מנצח בשלב
+                    let p1WinsRace = (player1.lives > 0 && player1.x < door.x + door.width && player1.x + player1.width > door.x && player1.y < door.y + door.height && player1.y + player1.height > door.y);
+                    let p2WinsRace = (player2.lives > 0 && player2.x < door.x + door.width && player2.x + player2.width > door.x && player2.y < door.y + door.height && player2.y + player2.height > door.y);
+
+                    if (p1WinsRace || p2WinsRace) {
+                        gameState = "LEVEL_COMPLETE";
+                        playSound("win");
+                        let winnerText = "";
+                        if (p1WinsRace && p2WinsRace) {
+                            winnerText = "תיקו! שני האבירים הגיעו יחד!";
+                        } else if (p1WinsRace) {
+                            p1RaceWins++;
+                            score += 500;
+                            winnerText = "🏆 שחקן 1 (כחול) ניצח בשלב והגיע ראשון!";
+                        } else {
+                            p2RaceWins++;
+                            score += 500;
+                            winnerText = "🏆 שחקן 2 (ירוק) ניצח בשלב והגיע ראשון!";
+                        }
+
+                        document.getElementById("level-complete-emoji").innerText = "🏁";
+                        document.getElementById("level-complete-title").innerText = `תוצאת שלב ${currentLevel}`;
+                        document.getElementById("level-complete-text").innerText = `${winnerText}
+
+מצב המרוץ עד כה:
+שחקן 1: ${p1RaceWins} | שחקן 2: ${p2RaceWins}`;
+                        document.getElementById("screen-level-complete").classList.remove("hidden");
+                    }
+                }
+            }
+
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                if (p.life <= 0) particles.splice(index, 1);
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // רקע ניאון זוהר ועמוק עם כוכבים נוצצים
+            let bgGrad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 50, canvas.width/2, canvas.height/2, 600);
+            bgGrad.addColorStop(0, "#1e1b4b");
+            bgGrad.addColorStop(0.5, "#0f0c29");
+            bgGrad.addColorStop(1, "#030014");
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // ציור כוכבים זוהרים ברקע
+            bgStars.forEach(star => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+                star.alpha += star.pulse;
+                if (star.alpha > 0.9 || star.alpha < 0.2) star.pulse *= -1;
+            });
+
+            // פלטפורמות עם זוהר ניאון
+            platforms.forEach(p => {
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 12;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+                ctx.fillStyle = "#38bdf8";
+                ctx.fillRect(p.x, p.y, p.width, 4);
+                ctx.shadowBlur = 0; // איפוס
+            });
+
+            movingPlatforms.forEach(mp => {
+                ctx.shadowColor = "#ec4899";
+                ctx.shadowBlur = 15;
+                ctx.fillStyle = "#ec4899";
+                ctx.fillRect(mp.x, mp.y, mp.width, mp.height);
+                ctx.fillStyle = "#fbcfe8";
+                ctx.fillRect(mp.x, mp.y, mp.width, 4);
+                ctx.shadowBlur = 0;
+            });
+
+            bouncePads.forEach(bp => {
+                ctx.shadowColor = "#f43f5e";
+                ctx.shadowBlur = 20;
+                ctx.fillStyle = "#f43f5e";
+                ctx.fillRect(bp.x, bp.y, bp.width, bp.height);
+                ctx.fillStyle = "#ffe4e6";
+                ctx.fillRect(bp.x + 4, bp.y + 3, bp.width - 8, 4);
+                ctx.shadowBlur = 0;
+            });
+
+            hazards.forEach(h => {
+                if (h.type === "lava") {
+                    ctx.shadowColor = "#ef4444";
+                    ctx.shadowBlur = 25;
+                    ctx.fillStyle = "#dc2626";
+                    ctx.fillRect(h.x, h.y, h.width, h.height);
+                    ctx.fillStyle = "#f97316";
+                    let time = Date.now() * 0.006;
+                    ctx.fillRect(h.x + (Math.sin(time) + 1) * 15, h.y + 4, 12, 10);
+                    ctx.shadowBlur = 0;
+                } else if (h.type === "spikes") {
+                    ctx.shadowColor = "#a855f7";
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = "#c084fc";
+                    for (let sx = h.x; sx < h.x + h.width; sx += 12) {
+                        ctx.beginPath();
+                        ctx.moveTo(sx, h.y + h.height);
+                        ctx.lineTo(sx + 6, h.y);
+                        ctx.lineTo(sx + 12, h.y + h.height);
+                        ctx.fill();
+                    }
+                    ctx.shadowBlur = 0;
+                }
+            });
+
+            // דלת יציאה / מרוץ
+            if (door) {
+                let isOpen = (playerCount === 2) || door.open;
+                ctx.shadowColor = isOpen ? "#10b981" : "#ec4899";
+                ctx.shadowBlur = 20;
+                ctx.fillStyle = isOpen ? "#059669" : "#4c1d95";
+                ctx.fillRect(door.x, door.y, door.width, door.height);
+                ctx.strokeStyle = isOpen ? "#34d399" : "#f43f5e";
+                ctx.lineWidth = 4;
+                ctx.strokeRect(door.x, door.y, door.width, door.height);
+                
+                ctx.font = "16px Rubik";
+                ctx.fillText(isOpen ? "🏁" : "🔒", door.x + 6, door.y - 12);
+                ctx.shadowBlur = 0;
+            }
+
+            if (playerCount === 1) {
+                if (keyItem && !keyItem.collected) {
+                    ctx.shadowColor = "#fbbf24";
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = "#f59e0b";
+                    ctx.beginPath();
+                    ctx.arc(keyItem.x + 10, keyItem.y + 6, 7, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillRect(keyItem.x + 8, keyItem.y + 11, 4, 10);
+                    ctx.shadowBlur = 0;
+                }
+
+                crystals.forEach(c => {
+                    if (!c.collected) {
+                        ctx.shadowColor = "#38bdf8";
+                        ctx.shadowBlur = 15;
+                        ctx.fillStyle = "#38bdf8";
+                        ctx.beginPath();
+                        let cx = c.x + c.width / 2;
+                        let cy = c.y + c.height / 2;
+                        ctx.moveTo(cx, c.y);
+                        ctx.lineTo(c.x + c.width, cy);
+                        ctx.lineTo(cx, c.y + c.height);
+                        ctx.lineTo(c.x, cy);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+                });
+            }
+
+            enemies.forEach(en => {
+                if (en.alive) {
+                    ctx.shadowColor = "#a855f7";
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = "#8b5cf6";
+                    ctx.fillRect(en.x, en.y, en.width, en.height);
+                    ctx.fillStyle = "#fef08a";
+                    ctx.fillRect(en.x + 4, en.y + 8, 5, 5);
+                    ctx.fillRect(en.x + 16, en.y + 8, 5, 5);
+                    ctx.shadowBlur = 0;
+                }
+            });
+
+            // שחקן 1 (כחול ניאון)
+            if (player1.lives > 0 && player1.invulnerableTime % 8 < 4) {
+                ctx.shadowColor = "#38bdf8";
+                ctx.shadowBlur = 18;
+                ctx.fillStyle = "#38bdf8";
+                ctx.fillRect(player1.x + 2, player1.y + 10, 24, 28);
+                ctx.fillStyle = "#0284c7";
+                ctx.fillRect(player1.x + 4, player1.y + 2, 20, 10);
+                ctx.fillStyle = "#f43f5e";
+                if (player1.facingRight) ctx.fillRect(player1.x, player1.y + 12, 4, 18);
+                else ctx.fillRect(player1.x + player1.width - 4, player1.y + 12, 4, 18);
+                ctx.shadowBlur = 0;
+            }
+
+            // שחקן 2 (ירוק ניאון)
+            if (playerCount === 2 && player2.lives > 0 && player2.invulnerableTime % 8 < 4) {
+                ctx.shadowColor = "#34d399";
+                ctx.shadowBlur = 18;
+                ctx.fillStyle = "#34d399";
+                ctx.fillRect(player2.x + 2, player2.y + 10, 24, 28);
+                ctx.fillStyle = "#059669";
+                ctx.fillRect(player2.x + 4, player2.y + 2, 20, 10);
+                ctx.fillStyle = "#facc15";
+                if (player2.facingRight) ctx.fillRect(player2.x, player2.y + 12, 4, 18);
+                else ctx.fillRect(player2.x + player2.width - 4, player2.y + 12, 4, 18);
+                ctx.shadowBlur = 0;
+            }
+
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.onload = function () {
+            requestAnimationFrame(gameLoop);
+        };
+    </script>
+</body>
+</html>

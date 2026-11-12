@@ -1,0 +1,52 @@
+[
+  {
+    "name": "אריאל כהן",
+    "project": "AI Phishing",
+    "js_syntax_errors": [],
+    "missing_local_files": [],
+    "inline_scripts": 2,
+    "external_dependencies": [
+      "https://cdn.tailwindcss.com"
+    ]
+  },
+  {
+    "name": "אורי עזאני",
+    "project": "Electro Store",
+    "js_syntax_errors": [],
+    "missing_local_files": [],
+    "inline_scripts": 2,
+    "external_dependencies": [
+      "https://cdn.tailwindcss.com"
+    ]
+  },
+  {
+    "name": "נועם רפאל כהן",
+    "project": "APTIK",
+    "js_syntax_errors": [],
+    "missing_local_files": [],
+    "inline_scripts": 2,
+    "external_dependencies": [
+      "https://cdn.tailwindcss.com"
+    ]
+  },
+  {
+    "name": "רנן אדלשטיין",
+    "project": "מרוץ האבירים",
+    "js_syntax_errors": [],
+    "missing_local_files": [],
+    "inline_scripts": 1,
+    "external_dependencies": [
+      "https://cdn.tailwindcss.com"
+    ]
+  },
+  {
+    "name": "שי בן זיקרי",
+    "project": "בורסת המותגים",
+    "js_syntax_errors": [],
+    "missing_local_files": [],
+    "inline_scripts": 1,
+    "external_dependencies": [
+      "https://cdn.tailwindcss.com"
+    ]
+  }
+]

@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אלקטרו-סטור | חנות מוצרי חשמל, טלפונים, מחשבים וטלוויזיות</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Heebo & Rubik for crisp Hebrew typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'Rubik', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            navy: '#1e293b',
+                            blue: '#0284c7',
+                            cyan: '#06b6d4',
+                            accent: '#3b82f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar & subtle animations */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .product-card-hover {
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+        }
+        .product-card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Smooth theme transitions */
+        .theme-transition {
+            transition: background-color 0.45s ease, background-image 0.45s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-pop-in {
+            animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-sky-500 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div id="topAnnouncementBar" class="bg-slate-900 text-slate-200 text-xs sm:text-sm py-2 px-4 text-center border-b border-slate-800 theme-transition">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
+            <span id="topBarHighlight" class="flex items-center gap-1.5 font-bold text-cyan-400 theme-transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                משלוח חינם עד הבית בקנייה מעל ₪499
+            </span>
+            <span class="hidden sm:inline text-slate-600">|</span>
+            <span>קוד קופון <strong class="text-white bg-white/10 px-1.5 py-0.5 rounded">SAVE10</strong> ל-10% הנחה בסל!</span>
+            <span class="hidden md:inline text-slate-600">|</span>
+            <span class="hidden md:inline">אחריות יבואן רשמי על כל המוצרים</span>
+        </div>
+    </div>
+
+    <!-- Sticky Header & Navigation -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20 gap-3 sm:gap-6">
+                
+                <!-- Brand Logo -->
+                <a href="#" onclick="resetFilters(event)" class="flex items-center gap-2.5 shrink-0 group">
+                    <div id="brandLogoBox" class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform theme-transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 block leading-none">אלקטרו<span id="brandLogoAccent" class="text-blue-600 theme-transition">-סטור</span></span>
+                        <span class="text-[11px] font-medium text-slate-500 hidden sm:block">טכנולוגיה, גיימינג וחשמל לבית</span>
+                    </div>
+                </a>
+
+                <!-- Live Search Bar (Desktop & Tablet) -->
+                <div class="flex-1 max-w-xl hidden md:block">
+                    <div class="relative">
+                        <input type="text" id="desktopSearchInput" oninput="handleSearch(this.value)" placeholder="חיפוש מוצר, מותג או משחק (לדוגמה: iPhone, Forza, הגה, OLED...)" 
+                            class="w-full bg-slate-100 hover:bg-slate-200/70 focus:bg-white text-slate-800 placeholder-slate-400 text-sm rounded-xl py-2.5 pr-11 pl-10 border border-transparent focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                        <svg class="w-5 h-5 text-slate-400 absolute right-3.5 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <button id="clearSearchBtnDesktop" onclick="clearSearch()" class="hidden absolute left-3 top-2.5 text-slate-400 hover:text-slate-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons (Favorites & Cart) -->
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <!-- Favorites Toggle -->
+                    <button id="wishlistFilterBtn" onclick="toggleWishlistFilter()" title="המועדפים שלי" 
+                        class="relative p-2.5 sm:px-3.5 sm:py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-2 transition-all">
+                        <svg id="wishlistHeaderIcon" class="w-5 h-5 text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        <span class="hidden lg:inline text-sm font-semibold">מועדפים</span>
+                        <span id="wishlistBadge" class="hidden bg-rose-500 text-white text-[11px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">0</span>
+                    </button>
+
+                    <!-- Cart Button -->
+                    <button id="headerCartBtn" onclick="toggleCart(true)" 
+                        class="relative p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-blue-600 hover:opacity-95 text-white flex items-center gap-2.5 shadow-sm transition-all active:scale-95 theme-transition">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <span class="hidden sm:inline text-sm font-bold">סל קניות</span>
+                        <span id="cartBadge" class="bg-white text-slate-900 text-xs font-black px-2 py-0.5 rounded-full min-w-[22px] text-center shadow-xs">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="pb-3 md:hidden">
+                <div class="relative">
+                    <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="חיפוש מוצרים, טלפונים, משחקי מכוניות..." 
+                        class="w-full bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 text-sm rounded-xl py-2.5 pr-10 pl-9 border border-slate-200 focus:border-blue-500 outline-none">
+                    <svg class="w-4 h-4 text-slate-400 absolute right-3.5 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <button id="clearSearchBtnMobile" onclick="clearSearch()" class="hidden absolute left-3 top-2.5 text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dynamic Category Theme Hero Banner -->
+    <section id="heroBanner" class="relative overflow-hidden text-white theme-transition" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);">
+        <!-- Decorative Background Glows -->
+        <div class="absolute inset-0 opacity-25 pointer-events-none">
+            <div id="heroGlow1" class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white blur-3xl theme-transition"></div>
+            <div id="heroGlow2" class="absolute bottom-0 left-10 w-80 h-80 rounded-full bg-sky-300 blur-3xl theme-transition"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Dynamic Category Text -->
+                <div class="lg:col-span-7 space-y-5 text-center lg:text-right">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 border border-white/25 text-white text-xs sm:text-sm font-bold backdrop-blur-sm">
+                        <span id="heroBadgeIcon">⚡</span>
+                        <span id="heroBadgeText">מחלקת הטכנולוגיה המלאה</span>
+                    </div>
+                    
+                    <h1 id="heroTitle" class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight animate-pop-in">
+                        כל עולם הטכנולוגיה, הגיימינג ומוצרי החשמל במקום אחד
+                    </h1>
+                    
+                    <p id="heroSubtitle" class="text-white/90 text-sm sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        בחר קטגוריה למטה וראה איך החנות משנה אווירה! סמארטפונים, מחשבים, טלוויזיות, משחקי מכוניות ומוצרי חשמל חכמים.
+                    </p>
+                    
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1">
+                        <button onclick="showAllProductsScroll()" class="px-6 py-3.5 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-black text-sm sm:text-base shadow-xl transition-all flex items-center gap-2.5 ring-4 ring-white/25">
+                            <span>🛍️ הצג את כל 42 המוצרים בגלילה חופשית</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                        </button>
+                        <button onclick="selectCategoryFromHero('racing')" class="px-5 py-3.5 rounded-xl bg-orange-500/95 hover:bg-orange-500 border border-orange-300/40 text-white font-bold text-sm sm:text-base backdrop-blur-sm transition-all shadow-md">
+                            🏎️ עולם משחקי המכוניות
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Category Switcher Cards in Hero -->
+                <div class="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5 sm:gap-3">
+                    <div onclick="selectCategoryFromHero('smartphones')" class="cursor-pointer bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md transition-all group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform inline-block">📱</div>
+                        <h3 class="font-bold text-white text-sm sm:text-base">טלפונים</h3>
+                        <p class="text-[11px] text-white/75">סגול יוקרתי • דגמי דגל</p>
+                    </div>
+
+                    <div onclick="selectCategoryFromHero('racing')" class="cursor-pointer bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md transition-all group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform inline-block">🏎️</div>
+                        <h3 class="font-bold text-white text-sm sm:text-base">משחקי מכוניות</h3>
+                        <p class="text-[11px] text-white/75">כתום-אש • הגאים ומשחקים</p>
+                    </div>
+
+                    <div onclick="selectCategoryFromHero('computers')" class="cursor-pointer bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md transition-all group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform inline-block">💻</div>
+                        <h3 class="font-bold text-white text-sm sm:text-base">מחשבים</h3>
+                        <p class="text-[11px] text-white/75">תכלת סייבר • עוצמה</p>
+                    </div>
+
+                    <div onclick="selectCategoryFromHero('tv')" class="cursor-pointer bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md transition-all group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform inline-block">📺</div>
+                        <h3 class="font-bold text-white text-sm sm:text-base">טלוויזיות</h3>
+                        <p class="text-[11px] text-white/75">אדום קולנועי • 4K/8K</p>
+                    </div>
+
+                    <div onclick="selectCategoryFromHero('appliances')" class="cursor-pointer bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md transition-all group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform inline-block">🏠</div>
+                        <h3 class="font-bold text-white text-sm sm:text-base">חשמל לבית</h3>
+                        <p class="text-[11px] text-white/75">ירוק רענן • בית חכם</p>
+                    </div>
+
+                    <div onclick="selectCategoryFromHero('gadgets')" class="cursor-pointer bg-white/10 hover:bg-white/20 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md transition-all group">
+                        <div class="text-2xl mb-1 group-hover:scale-110 transition-transform inline-block">🎧</div>
+                        <h3 class="font-bold text-white text-sm sm:text-base">גאדג׳טים</h3>
+                        <p class="text-[11px] text-white/75">ורוד מודרני • אודיו</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Catalog Section -->
+    <main id="catalogSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        
+        <!-- Dynamic Colored Category Tabs -->
+        <div class="mb-5">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">בחר מחלקה או צפה בהכל בגלילה חופשית:</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="showAllProductsScroll()" class="text-xs font-extrabold px-3 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-all">
+                        🛍️ הצג הכל (42 מוצרים)
+                    </button>
+                    <span id="activeCategoryPillIndicator" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 theme-transition">מחלקה פעילה: הכל</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-2" id="categoryTabs">
+                <!-- Populated by JS with unique colors per category -->
+            </div>
+        </div>
+
+        <!-- Colored Dynamic Category Banner Strip -->
+        <div id="categoryDynamicBanner" class="mb-6 p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 theme-transition bg-blue-50/80 border-blue-200 text-blue-950">
+            <div class="flex items-center gap-3">
+                <div id="stripIcon" class="w-11 h-11 rounded-xl bg-white shadow-sm flex items-center justify-center text-2xl shrink-0">⚡</div>
+                <div>
+                    <h2 id="stripTitle" class="font-black text-base sm:text-lg leading-tight">כל עולם הטכנולוגיה, הגיימינג ומוצרי החשמל במקום אחד</h2>
+                    <p id="stripSubtitle" class="text-xs sm:text-sm opacity-85 mt-0.5">גלול בחופשיות בין כל המוצרים או בחר מחלקה לשינוי אווירה</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <span id="resultsCount" class="text-xs sm:text-sm font-black px-3.5 py-2 rounded-xl bg-white shadow-xs text-slate-800 border border-slate-200/70">
+                    מציג 42 מוצרים
+                </span>
+            </div>
+        </div>
+
+        <!-- Rich Filters & Sorting Bar -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs mb-7 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <!-- Brand Select -->
+                <div>
+                    <label for="brandSelect" class="block text-xs font-bold text-slate-500 mb-1.5">סינון לפי מותג</label>
+                    <select id="brandSelect" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-blue-500">
+                        <option value="all">כל המותגים</option>
+                    </select>
+                </div>
+
+                <!-- Quick Price Presets -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">טווח מחיר מהיר</label>
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button type="button" data-preset="all" onclick="setPricePreset('all')" class="price-preset-btn px-2 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white transition-all">הכל</button>
+                        <button type="button" data-preset="under500" onclick="setPricePreset('under500')" class="price-preset-btn px-2 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">עד ₪500</button>
+                        <button type="button" data-preset="500to2000" onclick="setPricePreset('500to2000')" class="price-preset-btn px-2 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">500-2,000</button>
+                        <button type="button" data-preset="over2000" onclick="setPricePreset('over2000')" class="price-preset-btn px-2 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">מעל 2,000</button>
+                    </div>
+                </div>
+
+                <!-- Max Price Slider -->
+                <div>
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-500 mb-1.5">
+                        <span>תקציב מקסימלי:</span>
+                        <span id="maxPriceLabel" class="text-slate-900 font-black">₪12,000</span>
+                    </div>
+                    <input type="range" id="maxPriceRange" min="150" max="12000" step="50" value="12000" oninput="updatePriceLabel(this.value); applyFilters();" class="w-full accent-blue-600 cursor-pointer mt-1.5">
+                </div>
+
+                <!-- Sort Select -->
+                <div>
+                    <label for="sortSelect" class="block text-xs font-bold text-slate-500 mb-1.5">מיון תצוגה</label>
+                    <select id="sortSelect" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-blue-500">
+                        <option value="featured">מומלצים ביותר</option>
+                        <option value="price-asc">מחיר: מהנמוך לגבוה</option>
+                        <option value="price-desc">מחיר: מהגבוה לנמוך</option>
+                        <option value="rating">דירוג גולשים גבוה</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Attribute Checkboxes & Reset -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm font-semibold text-slate-700">
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="saleOnlyToggle" onchange="applyFilters()" class="rounded text-blue-600 w-4 h-4">
+                        <span>🔥 במבצע בלבד</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="newOnlyToggle" onchange="applyFilters()" class="rounded text-blue-600 w-4 h-4">
+                        <span>✨ חדש בחנות</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="inStockOnlyToggle" onchange="applyFilters()" class="rounded text-blue-600 w-4 h-4">
+                        <span>✅ במלאי מיידי</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="topRatedOnlyToggle" onchange="applyFilters()" class="rounded text-blue-600 w-4 h-4">
+                        <span>⭐ דירוג 4.8+</span>
+                    </label>
+                </div>
+
+                <button type="button" onclick="resetFilters()" class="text-xs font-extrabold text-slate-500 hover:text-slate-900 underline">
+                    איפוס כל המסננים
+                </button>
+            </div>
+        </div>
+
+        <!-- Products Grid (Interactive Square Cards with Real Image + Buy Button) -->
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Populated dynamically by renderProducts() -->
+        </div>
+
+        <!-- Empty Filter State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-slate-200 my-6 px-4">
+            <div class="text-5xl mb-3">🔍</div>
+            <h3 class="text-xl font-black text-slate-900">לא נמצאו מוצרים התואמים לחיפוש</h3>
+            <p class="text-sm text-slate-500 mt-1 mb-5">נסה לשנות את מילות החיפוש או לאפס את הסינונים כדי לראות את כל 42 המוצרים.</p>
+            <button onclick="resetFilters()" class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition-all">
+                הצג את כל המוצרים
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
+            <div>
+                <span class="text-xl font-black text-white">אלקטרו<span class="text-cyan-400">-סטור</span></span>
+                <p class="mt-2.5 leading-relaxed text-slate-400">החנות המובילה בישראל לסמארטפונים, מחשבים, טלוויזיות, סימולטורים ומשחקי מכוניות ומוצרי חשמל לבית באחריות יבואן רשמי.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-3">מחלקות החנות</h4>
+                <ul class="space-y-2">
+                    <li><button onclick="selectCategoryFromHero('smartphones')" class="hover:text-white transition-colors">📱 סמארטפונים וטלפונים</button></li>
+                    <li><button onclick="selectCategoryFromHero('racing')" class="hover:text-white transition-colors">🏎️ משחקי מכוניות וגיימינג</button></li>
+                    <li><button onclick="selectCategoryFromHero('computers')" class="hover:text-white transition-colors">💻 מחשבים ניידים ומסכים</button></li>
+                    <li><button onclick="selectCategoryFromHero('tv')" class="hover:text-white transition-colors">📺 טלוויזיות וסאונד</button></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-3">שירות לקוחות ומשלוחים</h4>
+                <p>משלוח אקספרס חינם עד הבית בקנייה מעל ₪499.</p>
+                <p class="mt-1.5">קוד קופון פעיל להנחה מיידית בסל: <span class="text-cyan-400 font-bold">SAVE10</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Quick-View Modal -->
+    <div id="productModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs" onclick="closeProductModal()">
+        <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-slate-200 relative animate-pop-in" onclick="event.stopPropagation()">
+            <button onclick="closeProductModal()" class="absolute top-4 left-4 z-20 w-9 h-9 rounded-full bg-white/90 hover:bg-slate-100 text-slate-700 flex items-center justify-center shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div id="productModalContent" class="grid grid-cols-1 md:grid-cols-12">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Slide-Over Drawer -->
+    <div id="cartDrawer" class="hidden fixed inset-0 z-50 flex justify-end bg-slate-900/60 backdrop-blur-xs" onclick="toggleCart(false)">
+        <div class="bg-slate-50 w-full max-w-md h-full flex flex-col justify-between shadow-2xl" onclick="event.stopPropagation()">
+            <!-- Cart Header -->
+            <div class="p-5 bg-white border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl">🛒</span>
+                    <h3 class="text-lg font-black text-slate-900">סל הקניות שלי</h3>
+                    <span id="drawerItemCount" class="text-xs font-bold bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full">0 פריטים</span>
+                </div>
+                <button onclick="toggleCart(false)" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Free Shipping Progress Bar -->
+            <div class="px-5 py-3 bg-emerald-50/80 border-b border-emerald-100">
+                <p id="shippingProgressText" class="text-xs font-bold text-emerald-800 mb-1.5">משלוח חינם בקנייה מעל ₪499</p>
+                <div class="w-full h-2 bg-emerald-200/70 rounded-full overflow-hidden">
+                    <div id="shippingProgressBar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Cart Items List -->
+            <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-5 space-y-3">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Cart Footer & Coupon -->
+            <div class="p-5 bg-white border-t border-slate-200 space-y-4">
+                <!-- Coupon Input -->
+                <div>
+                    <div class="flex gap-2">
+                        <input type="text" id="couponInput" placeholder="קוד קופון (נסה: SAVE10)" class="flex-1 bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2 text-sm outline-none focus:border-blue-500">
+                        <button type="button" onclick="applyCouponCode()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition-colors">הפעל</button>
+                    </div>
+                    <p id="couponFeedback" class="hidden text-xs font-bold mt-1.5"></p>
+                </div>
+
+                <!-- Summary -->
+                <div class="space-y-1.5 text-sm">
+                    <div class="flex justify-between text-slate-600">
+                        <span>סכום ביניים:</span>
+                        <span id="cartSubtotal" class="font-bold">₪0</span>
+                    </div>
+                    <div id="discountRow" class="hidden flex justify-between text-emerald-600 font-bold">
+                        <span>הנחת קופון (10%):</span>
+                        <span id="cartDiscount">-₪0</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>משלוח עד הבית:</span>
+                        <span id="cartShipping" class="font-semibold">₪0</span>
+                    </div>
+                    <div class="flex justify-between text-lg font-black text-slate-900 pt-2 border-t border-slate-100">
+                        <span>סה״כ לתשלום:</span>
+                        <span id="cartTotal">₪0</span>
+                    </div>
+                </div>
+
+                <button id="checkoutBtn" onclick="openCheckoutModal()" disabled class="w-full py-3.5 rounded-xl bg-blue-600 hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black text-base shadow-lg transition-all">
+                    המשך לתשלום והזמנה
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs" onclick="closeCheckoutModal()">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 animate-pop-in" onclick="event.stopPropagation()">
+            <div id="checkoutFormView">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-xl font-black text-slate-900">השלמת הזמנה מהירה</h3>
+                    <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-700">✕</button>
+                </div>
+                <form onsubmit="submitOrder(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">שם מלא</label>
+                        <input type="text" required placeholder="ישראל ישראלי" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">טלפון נייד לעדכון שליח</label>
+                        <input type="tel" required placeholder="050-0000000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">עיר וכתובת למשלוח</label>
+                        <input type="text" required placeholder="תל אביב, רוטשילד 10" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-blue-500">
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-100 flex items-center justify-between">
+                        <span class="text-sm font-bold text-slate-700">סה״כ לתשלום מאובטח:</span>
+                        <span id="checkoutModalTotal" class="text-xl font-black text-slate-900">₪0</span>
+                    </div>
+                    <button type="submit" class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base shadow-md transition-all">
+                        אישור הזמנה ותשלום
+                    </button>
+                </form>
+            </div>
+
+            <div id="checkoutSuccessView" class="hidden text-center py-6 space-y-4">
+                <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto">✓</div>
+                <h3 class="text-2xl font-black text-slate-900">ההזמנה התקבלה בהצלחה!</h3>
+                <p class="text-sm text-slate-600">מספר הזמנה: <strong id="orderNumberDisplay" class="text-slate-900">#IL-00000</strong><br>המשלוח בדרך אליך עם שליח עד הבית.</p>
+                <button onclick="finishOrderAndClose()" class="w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-sm">חזרה לחנות</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        // Category Definitions with Unique Color Themes & Headlines
+        const CATEGORIES = [
+            {
+                id: 'all',
+                name: 'הכל',
+                icon: '⚡',
+                primaryHex: '#2563eb',
+                darkHex: '#1e3a8a',
+                lightBg: '#eff6ff',
+                lightBorder: '#bfdbfe',
+                lightText: '#1e3a8a',
+                badgeText: 'כל המחלקות בחנות • 42 מוצרים',
+                headline: 'כל עולם הטכנולוגיה, הגיימינג ומוצרי החשמל במקום אחד',
+                subheadline: 'בחר קטגוריה וראה איך החנות משנה אווירה! סמארטפונים, מחשבים, טלוויזיות, משחקי מכוניות ומוצרי חשמל חכמים.'
+            },
+            {
+                id: 'smartphones',
+                name: 'טלפונים',
+                icon: '📱',
+                primaryHex: '#7c3aed',
+                darkHex: '#4c1d95',
+                lightBg: '#f5f3ff',
+                lightBorder: '#ddd6fe',
+                lightText: '#4c1d95',
+                badgeText: 'מחלקת סמארטפונים ודגמי דגל',
+                headline: 'הסמארטפונים המתקדמים בעולם מחכים לך כאן',
+                subheadline: 'אייפון 16 פרו מקס, גלקסי S25 אולטרה, שיאומי ופיקסל – כולל אחריות יבואן רשמי.'
+            },
+            {
+                id: 'racing',
+                name: 'משחקי מכוניות וגיימינג',
+                icon: '🏎️',
+                primaryHex: '#ea580c',
+                darkHex: '#7c2d12',
+                lightBg: '#fff7ed',
+                lightBorder: '#fed7aa',
+                lightText: '#7c2d12',
+                badgeText: 'עולם המרוצים, ההגאים והקונסולות',
+                headline: 'אדרנלין על המסלול: משחקי מכוניות, הגאים וסימולטורים',
+                subheadline: 'Forza Horizon 5, Gran Turismo 7, הגה מרוצים Logitech G29, כיסאות מרוץ וקונסולת PS5 Pro.'
+            },
+            {
+                id: 'computers',
+                name: 'מחשבים',
+                icon: '💻',
+                primaryHex: '#0284c7',
+                darkHex: '#0c4a6e',
+                lightBg: '#f0f9ff',
+                lightBorder: '#bae6fd',
+                lightText: '#0c4a6e',
+                badgeText: 'מחלקת מחשבים ניידים, טאבלטים ומסכים',
+                headline: 'עוצמת מחשוב ללא פשרות לעבודה, לימודים וגיימינג',
+                subheadline: 'מחשבי MacBook Pro, לפטופים לגיימרים של ASUS ו-Lenovo ומסכים קעורים רחבים.'
+            },
+            {
+                id: 'tv',
+                name: 'טלוויזיות',
+                icon: '📺',
+                primaryHex: '#dc2626',
+                darkHex: '#7f1d1d',
+                lightBg: '#fef2f2',
+                lightBorder: '#fecaca',
+                lightText: '#7f1d1d',
+                badgeText: 'מחלקת מסכי ענק וקולנוע ביתי',
+                headline: 'חוויית קולנוע אמיתית בסלון ב-4K OLED ו-Mini-LED',
+                subheadline: 'מסכי ענק מבית LG, Samsung, Sony ו-TCL לצד מקרנים וסאונדברים עוצמתיים.'
+            },
+            {
+                id: 'appliances',
+                name: 'חשמל לבית',
+                icon: '🏠',
+                primaryHex: '#059669',
+                darkHex: '#064e3b',
+                lightBg: '#ecfdf5',
+                lightBorder: '#a7f3d0',
+                lightText: '#064e3b',
+                badgeText: 'מחלקת מוצרי חשמל חכמים לבית ולמטבח',
+                headline: 'הופכים את הבית לחכם, נקי ונוח יותר בכל יום',
+                subheadline: 'שואבי Dyson ו-Roborock, מכונות קפה DeLonghi, מקררים ומכונות כביסה מובילות.'
+            },
+            {
+                id: 'gadgets',
+                name: 'גאדג׳טים ואודיו',
+                icon: '🎧',
+                primaryHex: '#db2777',
+                darkHex: '#831843',
+                lightBg: '#fdf2f8',
+                lightBorder: '#fbcfe8',
+                lightText: '#831843',
+                badgeText: 'מחלקת אוזניות, שעונים חכמים ורחפנים',
+                headline: 'סאונד מושלם וגאדג׳טים חכמים שתמיד איתך',
+                subheadline: 'אוזניות מבטלות רעשים Sony ו-AirPods, שעוני Apple Watch, רחפני DJI ומשקפי VR.'
+            }
+        ];
+
+        // Helper to render real product photography with clean fallback
+        function getProductImageHtml(product, sizeClass = 'w-full h-full object-cover') {
+            const imgUrl = product.imageUrl || 'https://placehold.co/600x450/0f172a/ffffff?text=ElectroStore';
+            const fallbackUrl = `https://placehold.co/600x450/1e293b/ffffff?text=${encodeURIComponent(product.brand)}`;
+            return `<img src="${imgUrl}" alt="${product.title}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackUrl}';" class="${sizeClass}">`;
+        }
+
+        // Comprehensive 42-Product Catalog across all 6 categories
+        const PRODUCTS = [
+            // --- SMARTPHONES (7) ---
+            {
+                id: 1,
+                title: 'Apple iPhone 16 Pro Max 256GB',
+                brand: 'Apple',
+                category: 'smartphones',
+                price: 5490,
+                originalPrice: 5990,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.9,
+                reviews: 142,
+                shortSpecs: 'מסך 6.9" Super Retina | שבב A18 Pro | טיטניום טבעי',
+                imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי Apple ישראל',
+                fullSpecs: [
+                    'מעבד Apple A18 Pro עוצמתי במיוחד עם מנוע בינה מלאכותית',
+                    'מסך 6.9 אינץ׳ Super Retina XDR עם קצב רענון 120Hz ProMotion',
+                    'מערך צילום משולש 48MP עם זום אופטי 5x וכפתור שליטה ייעודי',
+                    'שלדת טיטניום קלה ועמידה בתקן IP68 נגד מים ואבק',
+                    'נפח אחסון 256GB, חיבור USB-C מהיר'
+                ]
+            },
+            {
+                id: 2,
+                title: 'Samsung Galaxy S25 Ultra 512GB',
+                brand: 'Samsung',
+                category: 'smartphones',
+                price: 4990,
+                originalPrice: 5490,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.8,
+                reviews: 98,
+                shortSpecs: 'מסך 6.9" QHD+ | מצלמת 200MP | כולל עט S-Pen',
+                imageUrl: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי סאני תקשורת',
+                fullSpecs: [
+                    'מעבד Snapdragon 8 Elite for Galaxy המותאם לביצועי AI',
+                    'מצלמה ראשית 200MP עם ייצוב תמונה אופטי וצילום לילה מתקדם',
+                    'עט S-Pen מובנה לכתיבה, שרטוט ושליטה מרחוק',
+                    'סוללת 5000mAh עם טעינה מהירה 45W',
+                    'נפח אחסון 512GB וזיכרון 12GB RAM'
+                ]
+            },
+            {
+                id: 17,
+                title: 'Xiaomi 15 Ultra 512GB Leica Edition',
+                brand: 'Xiaomi',
+                category: 'smartphones',
+                price: 3890,
+                originalPrice: 4290,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.7,
+                reviews: 63,
+                shortSpecs: 'עדשות Leica מקצועיות | טעינה 90W | מסך AMOLED 120Hz',
+                imageUrl: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי המילטון',
+                fullSpecs: [
+                    'מערך צילום בשיתוף Leica עם חיישן 1 אינץ׳ לתמונות חדות להפליא',
+                    'טעינה חוטית אולטרה-מהירה 90W וטעינה אלחוטית 80W',
+                    'מסך AMOLED LTPO בהיר במיוחד 3200 nits',
+                    'עמידות למים ואבק בתקן IP68'
+                ]
+            },
+            {
+                id: 26,
+                title: 'Google Pixel 9 Pro XL 256GB Obsidian',
+                brand: 'Google',
+                category: 'smartphones',
+                price: 4290,
+                originalPrice: 4690,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.8,
+                reviews: 79,
+                shortSpecs: 'מעבד Google Tensor G4 | בינה מלאכותית Gemini | מצלמת AI',
+                imageUrl: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי',
+                fullSpecs: [
+                    'חוויית אנדרואיד נקייה עם 7 שנות עדכוני מערכת ואבטחה',
+                    'עיבוד תמונה מתקדם של Google לעריכת תמונות חכמה וצילום לילה',
+                    'מסך Super Actua OLED בגודל 6.8 אינץ׳',
+                    '16GB RAM לביצועי בינה מלאכותית מהירים'
+                ]
+            },
+            {
+                id: 27,
+                title: 'Samsung Galaxy Z Fold 6 512GB מתקפל',
+                brand: 'Samsung',
+                category: 'smartphones',
+                price: 6390,
+                originalPrice: 6990,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.8,
+                reviews: 54,
+                shortSpecs: 'מסך פנימי ענק 7.6" מתקפל | Galaxy AI | קל ודק במיוחד',
+                imageUrl: 'https://images.unsplash.com/photo-1678911820864-e2c567c655d7?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי סאני',
+                fullSpecs: [
+                    'נפתח לטאבלט עבודה ובידור בגודל 7.6 אינץ׳ בבהירות גבוהה',
+                    'ציר קיפול משופר ודק במיוחד עם עמידות למים IP48',
+                    'ריבוי משימות של עד 3 אפליקציות במקביל על המסך'
+                ]
+            },
+            {
+                id: 28,
+                title: 'OnePlus 13 512GB 16GB RAM Hasselblad',
+                brand: 'OnePlus',
+                category: 'smartphones',
+                price: 3690,
+                originalPrice: 3990,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.8,
+                reviews: 48,
+                shortSpecs: 'סוללת ענק 6000mAh | טעינה 100W ב-35 דק׳ | מצלמת Hasselblad',
+                imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי סל-נאו',
+                fullSpecs: [
+                    'סוללת סיליקון-פחמן 6000mAh המחזיקה יומיים מלאים',
+                    'מטען מהיר 100W SUPERVOOC כלול באריזה',
+                    'כיול צבעים מקצועי בשיתוף Hasselblad'
+                ]
+            },
+            {
+                id: 29,
+                title: 'Apple iPhone 15 Plus 128GB כחול פסטל',
+                brand: 'Apple',
+                category: 'smartphones',
+                price: 3590,
+                originalPrice: 3990,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.7,
+                reviews: 112,
+                shortSpecs: 'מסך גדול 6.7" | Dynamic Island | מצלמת 48MP | סוללה חזקה',
+                imageUrl: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי',
+                fullSpecs: [
+                    'מסך 6.7 אינץ׳ Super Retina XDR גדול ובהיר',
+                    'חיי סוללה מהארוכים ביותר בסדרת אייפון',
+                    'חיבור USB-C אוניברסלי וזכוכית גב בגימור מט יוקרתי'
+                ]
+            },
+
+            // --- CAR RACING & GAMING (8) ---
+            {
+                id: 18,
+                title: 'משחק מרוצים Forza Horizon 5 - PS5 / Xbox',
+                brand: 'Microsoft',
+                category: 'racing',
+                price: 249,
+                originalPrice: 299,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.9,
+                reviews: 312,
+                shortSpecs: 'עולם פתוח ענק במקסיקו | מעל 700 רכבי על | גרפיקת 4K 60FPS',
+                imageUrl: 'https://images.unsplash.com/photo-1547394765-185e1e68f34e?auto=format&fit=crop&w=800&q=80',
+                warranty: 'אחריות יבואן רשמי - עותק פיזי חדש באריזה',
+                fullSpecs: [
+                    'נהיגה חופשית בנופים המרהיבים של מקסיקו עם מזג אוויר דינמי',
+                    'אוסף של למעלה מ-700 מכוניות מרוץ, ספורט ושטח ברישיון רשמי',
+                    'מצב מרוצי אונליין, אתגרי דריפט ובניית מסלולים מותאמים אישית',
+                    'תמיכה מלאה בהגאי מרוצים ורטט אדפטיבי'
+                ]
+            },
+            {
+                id: 19,
+                title: 'משחק Gran Turismo 7 (PS5) מהדורה מלאה',
+                brand: 'Sony',
+                category: 'racing',
+                price: 269,
+                originalPrice: 319,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.9,
+                reviews: 245,
+                shortSpecs: 'סימולטור הנהיגה הריאליסטי בעולם | תמיכה ב-PS VR2 ו-4K HDR',
+                imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80',
+                warranty: 'אחריות יבואן רשמי ישפאר',
+                fullSpecs: [
+                    'פיזיקת נהיגה מדויקת ברמת סימולטור מקצועי',
+                    'מעל 400 רכבים קלאסיים ומודרניים ו-90 מסלולי מרוץ בינלאומיים',
+                    'תמיכה מלאה במשקפי מציאות מדומה PS VR2 לחוויית נהיגה מתוך תא הנהג',
+                    'טעינה מיידית בזכות כונן ה-SSD של PlayStation 5'
+                ]
+            },
+            {
+                id: 20,
+                title: 'הגה מרוצים מקצועי Logitech G29 Driving Force + דוושות',
+                brand: 'Logitech',
+                category: 'racing',
+                price: 1290,
+                originalPrice: 1590,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.9,
+                reviews: 198,
+                shortSpecs: 'משוב כוח כפול (Force Feedback) | ציפוי עור | 3 דוושות מתכת',
+                imageUrl: 'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי בנדא מגנטיק',
+                fullSpecs: [
+                    'מנוע כפול המדמה תחושת כביש, החלקה וגבשושיות בזמן אמת',
+                    'סיבוב הגה מלא של 900 מעלות (שני סיבובים וחצי) כמו ברכב אמיתי',
+                    'יחידת דוושות נפרדת מפלדת אל-חלד (גז, בלם לא-ליניארי ומצמד)',
+                    'ידיות העברת הילוכים מאלומיניום מאחורי ההגה + נוריות סל"ד LED',
+                    'תואם ל-PS5, PS4 ולמחשב אישי (PC)'
+                ]
+            },
+            {
+                id: 21,
+                title: 'משחק Need for Speed Unbound - מהדורת מרוצי רחוב',
+                brand: 'EA Sports',
+                category: 'racing',
+                price: 189,
+                originalPrice: 249,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.6,
+                reviews: 134,
+                shortSpecs: 'מרוצי רחוב ליליים | מרדפי משטרה | שיפורי מנוע ועיצוב רכב',
+                imageUrl: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
+                warranty: 'עותק מקורי חדש באריזה',
+                fullSpecs: [
+                    'התחרו נגד השעון, התחמקו מניידות משטרה והעפילו למרוצי ה-Grand',
+                    'אפשרויות התאמה אישית אינסופיות למראה הרכב, הספוילרים והצליל',
+                    'אפקטים ויזואליים ייחודיים ופסקול קצבי סוחף'
+                ]
+            },
+            {
+                id: 30,
+                title: 'משחק מרוצי פורמולה EA Sports F1 24 - PS5 / PC',
+                brand: 'EA Sports',
+                category: 'racing',
+                price: 239,
+                originalPrice: 289,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.8,
+                reviews: 115,
+                shortSpecs: 'אליפות הפורמולה 1 הרשמית | כל המסלולים והנהגים | מצב קריירה',
+                imageUrl: 'https://images.unsplash.com/photo-1532906619279-a4b7267faa66?auto=format&fit=crop&w=800&q=80',
+                warranty: 'עותק מקורי חדש באריזה',
+                fullSpecs: [
+                    'היכנסו לנעלי הנהגים הגדולים בעולם ב-24 מסלולי הגרנד פרי הרשמיים',
+                    'פיזיקת מתלים ואווירודינמיקה משופרת לתחושת נהיגה אמיתית',
+                    'מצב קריירה חדש המאפשר לבנות מורשת מרוצים לאורך עונות'
+                ]
+            },
+            {
+                id: 22,
+                title: 'כיסא גיימינג ומרוצים ארגונומי Sharkoon Skiller',
+                brand: 'Sharkoon',
+                category: 'racing',
+                price: 990,
+                originalPrice: 1190,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.7,
+                reviews: 88,
+                shortSpecs: 'עיצוב מושב רכב מרוץ | כריות תמיכה לצוואר ולגב | הטיה 160°',
+                imageUrl: 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי',
+                fullSpecs: [
+                    'עיצוב ספורטיבי בהשראת מושבי מרוצים מקצועיים לנוחות מקסימלית',
+                    'משענות יד מתכווננות ובוכנת גז חזקה עד 130 ק"ג',
+                    'כולל כרית תמיכה לגב התחתון וכרית ראש מתכווננת'
+                ]
+            },
+            {
+                id: 11,
+                title: 'קונסולת גיימינג Sony PlayStation 5 Pro 2TB',
+                brand: 'Sony',
+                category: 'racing',
+                price: 3490,
+                originalPrice: 3790,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.9,
+                reviews: 164,
+                shortSpecs: 'נפח 2TB SSD | תמיכה ב-8K ו-Ray Tracing מתקדם | שלט DualSense',
+                imageUrl: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי ישפאר',
+                fullSpecs: [
+                    'מעבד גרפי משודרג לביצועי 4K חלקים ב-60/120 פריימים לשנייה',
+                    'טכנולוגיית PlayStation Spectral Super Resolution (PSSR) לחדות שיא',
+                    'כונן SSD אולטרה-מהיר בנפח 2TB מובנה לאחסון עשרות משחקים',
+                    'קישוריות Wi-Fi 7 מתקדמת למשחקי רשת ללא השהיות',
+                    'כולל בקר אלחוטי DualSense עם משוב הפטי והדקים אדפטיביים'
+                ]
+            },
+            {
+                id: 23,
+                title: 'בקר אלחוטי Sony DualSense Edge Pro לגיימרים',
+                brand: 'Sony',
+                category: 'racing',
+                price: 849,
+                originalPrice: 899,
+                onSale: false,
+                isNew: false,
+                inStock: true,
+                rating: 4.8,
+                reviews: 74,
+                shortSpecs: 'כפתורים אחוריים הניתנים לתכנות | מוטות ניתנים להחלפה | נרתיק',
+                imageUrl: 'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי ישפאר',
+                fullSpecs: [
+                    'התאמה אישית מלאה של רגישות הג׳ויסטיקים והדקי הגז/בלם',
+                    'מעבר מהיר בין פרופילי שליטה למשחקי מרוצים, יריות וספורט',
+                    'כולל נרתיק נשיאה קשיח המאפשר טעינה דרך USB-C'
+                ]
+            },
+
+            // --- COMPUTERS (7) ---
+            {
+                id: 3,
+                title: 'Apple MacBook Pro 14" M4 Pro',
+                brand: 'Apple',
+                category: 'computers',
+                price: 8990,
+                originalPrice: 9690,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 5.0,
+                reviews: 64,
+                shortSpecs: 'שבב M4 Pro | 24GB RAM | 512GB SSD | Liquid Retina XDR',
+                imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי במעבדות מוסמכות',
+                fullSpecs: [
+                    'מעבד Apple M4 Pro בעל 12 ליבות CPU ו-16 ליבות GPU',
+                    'זיכרון מאוחד 24GB RAM לעבודה חלקה עם תוכנות עריכה ותכנות',
+                    'מסך 14.2 אינץ׳ Liquid Retina XDR בבהירות שיא של 1600 nits',
+                    'חיי סוללה מדהימים של עד 22 שעות עבודה רצופה',
+                    '3 חיבורי Thunderbolt 5, HDMI, קורא כרטיסי SD ו-MagSafe 3'
+                ]
+            },
+            {
+                id: 4,
+                title: 'מחשב נייד גיימינג ASUS ROG Strix G16',
+                brand: 'ASUS',
+                category: 'computers',
+                price: 6790,
+                originalPrice: 6790,
+                onSale: false,
+                isNew: false,
+                inStock: true,
+                rating: 4.7,
+                reviews: 51,
+                shortSpecs: 'Intel Core i9 | RTX 4070 8GB | 16" 240Hz | 1TB SSD',
+                imageUrl: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות יבואן רשמי ASUS ישראל',
+                fullSpecs: [
+                    'מעבד Intel Core i9-14900HX מהדור ה-14',
+                    'כרטיס מסך NVIDIA GeForce RTX 4070 8GB GDDR6',
+                    'מסך גיימינג 16 אינץ׳ FHD+ בקצב רענון מהיר 240Hz',
+                    'זיכרון 32GB DDR5 וכונן 1TB PCIe 4.0 NVMe SSD',
+                    'מערכת קירור מתקדמת עם 3 מאווררים ותאורת RGB מלאה'
+                ]
+            },
+            {
+                id: 15,
+                title: 'טאבלט Apple iPad Air 11" M2 128GB Wi-Fi',
+                brand: 'Apple',
+                category: 'computers',
+                price: 2690,
+                originalPrice: 2890,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.8,
+                reviews: 67,
+                shortSpecs: 'שבב M2 מהיר | מסך Liquid Retina 11" | תמיכה ב-Apple Pencil Pro',
+                imageUrl: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי',
+                fullSpecs: [
+                    'מעבד Apple M2 המעניק ביצועי גרפיקה וריבוי משימות ברמת מחשב נייד',
+                    'מסך Liquid Retina בגודל 11 אינץ׳ עם ציפוי נוגד השתקפות',
+                    'מצלמה קדמית 12MP Ultra Wide ממוקמת לרוחב לשיחות וידאו מושלמות',
+                    'חיישן טביעת אצבע Touch ID מובנה בכפתור העליון',
+                    'קישוריות Wi-Fi 6E אולטרה-מהירה'
+                ]
+            },
+            {
+                id: 24,
+                title: 'מחשב נייד דק במיוחד Dell XPS 13 OLED Touch',
+                brand: 'Dell',
+                category: 'computers',
+                price: 6290,
+                originalPrice: 6890,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.8,
+                reviews: 43,
+                shortSpecs: 'Intel Core Ultra 7 | מסך מגע 3K OLED | משקל 1.17 ק"ג בלבד',
+                imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות באתר הלקוח ע"י Dell ישראל',
+                fullSpecs: [
+                    'גוף אלומיניום יוקרתי במשקל נוצה של 1.17 ק"ג בלבד',
+                    'מסך מגע 13.4 אינץ׳ 3K OLED עם צבעים מרהיבים ושוליים דקיקים',
+                    '16GB LPDDR5X וכונן 1TB SSD מהיר במיוחד',
+                    'סוללה ליום עבודה מלא עם טעינה מהירה ExpressCharge'
+                ]
+            },
+            {
+                id: 31,
+                title: 'מחשב גיימינג Lenovo Legion Pro 7i RTX 4080',
+                brand: 'Lenovo',
+                category: 'computers',
+                price: 10490,
+                originalPrice: 11490,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.9,
+                reviews: 39,
+                shortSpecs: 'RTX 4080 12GB | 32GB RAM | מסך 16" WQXGA 240Hz',
+                imageUrl: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות VIP באתר הלקוח',
+                fullSpecs: [
+                    'כרטיס מסך עוצמתי NVIDIA RTX 4080 12GB להרצת כל משחק בהגדרות Ultra',
+                    'מערכת קירור Coldfront 5.0 עם תא אידוי מתקדם',
+                    'מקלדת גיימינג עם תאורת RGB לכל מקש בנפרד'
+                ]
+            },
+            {
+                id: 32,
+                title: 'מסך גיימינג קעור ענק Samsung Odyssey G9 49" OLED',
+                brand: 'Samsung',
+                category: 'computers',
+                price: 5490,
+                originalPrice: 6290,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.9,
+                reviews: 72,
+                shortSpecs: 'רוחב ענק 49 אינץ׳ | קצב 240Hz | זמן תגובה 0.03ms',
+                imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות יבואן רשמי',
+                fullSpecs: [
+                    'מסך אולטרה-רחב 32:9 השווה לשני מסכי 27 אינץ׳ צמודים ללא מסגרת באמצע',
+                    'פאנל QD-OLED עם זמן תגובה אפסי של 0.03ms',
+                    'אידיאלי לסימולטורים של מרוצי מכוניות ועבודה מרובת חלונות'
+                ]
+            },
+            {
+                id: 33,
+                title: 'מחשב נייד 2 ב-1 HP Spectre x360 14" OLED',
+                brand: 'HP',
+                category: 'computers',
+                price: 5790,
+                originalPrice: 6190,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.7,
+                reviews: 31,
+                shortSpecs: 'מתהפך לטאבלט 360° | כולל עט מגע | 16GB RAM | 1TB SSD',
+                imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות HP ישראל',
+                fullSpecs: [
+                    'ציר 360 מעלות המאפשר שימוש כמחשב נייד, טאבלט או מעמד צפייה',
+                    'כולל עט סטיילוס נטען מגנטית לכתיבה וציור על המסך',
+                    '4 רמקולים מבית Bang & Olufsen לסאונד עשיר'
+                ]
+            },
+
+            // --- TV (7) ---
+            {
+                id: 5,
+                title: 'טלוויזיה LG OLED evo C4 65" 4K',
+                brand: 'LG',
+                category: 'tv',
+                price: 6490,
+                originalPrice: 7490,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.9,
+                reviews: 118,
+                shortSpecs: 'פאנל OLED 4K 144Hz | מעבד α9 AI Gen7 | Dolby Vision',
+                imageUrl: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות יבואן רשמי ח.י. אלקטרוניקה',
+                fullSpecs: [
+                    'פיקסלים מאירים עצמאית לשחור מוחלט וניגודיות אינסופית',
+                    'מעבד בינה מלאכותית α9 AI 4K Gen7 לשיפור תמונה וסאונד בזמן אמת',
+                    'תמיכה מלאה בגיימינג: 4 כניסות HDMI 2.1, קצב 144Hz, G-Sync ו-FreeSync',
+                    'מערכת הפעלה חכמה webOS 24 בעברית מלאה כולל שלט חכם',
+                    'עיצוב דקיק במיוחד כמעט ללא שוליים'
+                ]
+            },
+            {
+                id: 6,
+                title: 'טלוויזיה Samsung QLED 75" 4K Smart',
+                brand: 'Samsung',
+                category: 'tv',
+                price: 5290,
+                originalPrice: 5990,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.6,
+                reviews: 84,
+                shortSpecs: 'גודל ענק 75 אינץ׳ | טכנולוגיית Quantum Dot | HDR10+',
+                imageUrl: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי סמליין',
+                fullSpecs: [
+                    'מסך ענק 75 אינץ׳ לחוויית קולנוע ביתית סוחפת',
+                    'טכנולוגיית Quantum Dot המציגה 100% נפח צבע',
+                    'עיצוב AirSlim דק במיוחד הנצמד לקיר באלגנטיות',
+                    'סאונד עוקב תנועה OTS Lite לשמע היקפי מדויק',
+                    'תמיכה בכל אפליקציות הסטרימינג הישראליות והבינלאומיות'
+                ]
+            },
+            {
+                id: 34,
+                title: 'טלוויזיה Sony Bravia XR A95L 65" QD-OLED',
+                brand: 'Sony',
+                category: 'tv',
+                price: 9490,
+                originalPrice: 10990,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 5.0,
+                reviews: 57,
+                shortSpecs: 'פאנל QD-OLED מרהיב | מעבד Cognitive XR | סאונד מתוך המסך',
+                imageUrl: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות יבואן רשמי ישפאר',
+                fullSpecs: [
+                    'טכנולוגיית Acoustic Surface Audio+ ההופכת את המסך עצמו לרמקול',
+                    'בהירות שיא וצבעים טבעיים בדיוק קולנועי של אולפני סוני',
+                    'מערכת Google TV מלאה בעברית כולל Chromecast מובנה'
+                ]
+            },
+            {
+                id: 35,
+                title: 'טלוויזיית ענק TCL C855 85" QD-Mini LED 4K',
+                brand: 'TCL',
+                category: 'tv',
+                price: 7890,
+                originalPrice: 8990,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.8,
+                reviews: 69,
+                shortSpecs: 'גודל עצום 85 אינץ׳ | תאורת Mini-LED | רמקולים Onkyo',
+                imageUrl: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות יבואן רשמי',
+                fullSpecs: [
+                    'מעל 2,000 אזורי עמעום מקומי לשליטה מדויקת באור וצל',
+                    'מערכת סאונד 2.2.2 ערוצים מובנית מבית Onkyo עם סאבוופר אחורי',
+                    'קצב רענון 144Hz לגיימינג חלק על מסך ענק'
+                ]
+            },
+            {
+                id: 36,
+                title: 'טלוויזיה Hisense U8N 65" ULED Mini-LED 4K',
+                brand: 'Hisense',
+                category: 'tv',
+                price: 3990,
+                originalPrice: 4590,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.7,
+                reviews: 81,
+                shortSpecs: 'בהירות שיא 3000 nits | תמיכה ב-Dolby Atmos | שלט סולארי',
+                imageUrl: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?auto=format&fit=crop&w=800&q=80',
+                warranty: '3 שנות אחריות יבואן רשמי אקזיט',
+                fullSpecs: [
+                    'תאורת Mini-LED Pro מתקדמת לצפייה ברורה גם בסלון מואר מאוד',
+                    'שלט רחוק נטען מאור השמש ותאורת הבית ללא צורך בסוללות',
+                    'מערכת הפעלה מהירה עם תמיכה בכל שירותי התוכן'
+                ]
+            },
+            {
+                id: 37,
+                title: 'סאונדבר קולנוע ביתי Sonos Arc Ultra Dolby Atmos',
+                brand: 'Sonos',
+                category: 'tv',
+                price: 4190,
+                originalPrice: 4590,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.9,
+                reviews: 62,
+                shortSpecs: '14 דרייברים מובנים | סאונד היקפי 9.1.4 | חיבור HDMI eARC',
+                imageUrl: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי באג',
+                fullSpecs: [
+                    'טכנולוגיית Sound Motion לבאס עוצמתי מתוך גוף דק ואלגנטי',
+                    'כיול סאונד אוטומטי Trueplay לפי האקוסטיקה של הסלון שלך',
+                    'שיפור בהירות דיבור מתקדם לסרטים וסדרות'
+                ]
+            },
+            {
+                id: 38,
+                title: 'מקרן קולנוע לייזר חכם Samsung The Freestyle Gen 2',
+                brand: 'Samsung',
+                category: 'tv',
+                price: 2490,
+                originalPrice: 2990,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.7,
+                reviews: 95,
+                shortSpecs: 'הקרנה עד 100 אינץ׳ | כיוון אוטומטי | רמקול 360° מובנה',
+                imageUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי סמליין',
+                fullSpecs: [
+                    'קומפקטי ונייד – הקרינו מסך 100 אינץ׳ על הקיר או התקרה בכל חדר',
+                    'פוקוס אוטומטי ויישור תמונה חכם תוך שניות',
+                    'מערכת Smart TV מלאה מובנית ללא צורך בחיבור למחשב'
+                ]
+            },
+
+            // --- APPLIANCES (7) ---
+            {
+                id: 7,
+                title: 'שואב אבק אלחוטי Dyson V15 Detect Absolute',
+                brand: 'Dyson',
+                category: 'appliances',
+                price: 2790,
+                originalPrice: 3290,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.9,
+                reviews: 215,
+                shortSpecs: 'עוצמת שאיבה 240AW | מברשת לייזר | עד 60 דקות עבודה',
+                imageUrl: 'https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי ב.נ.ז.כ סחר',
+                fullSpecs: [
+                    'מברשת Fluffy Optic עם אלומת אור ירוקה החושפת אבק בלתי נראה',
+                    'חיישן Piezo המודד ומונה חלקיקי אבק ומגביר עוצמה אוטומטית',
+                    'מסך LCD המציג בזמן אמת את כמות האבק שנשאבה וזמן סוללה נותר',
+                    'מערכת סינון HEPA רב-שלבית הלוכדת 99.99% מהחלקיקים',
+                    'כולל ערכת אביזרים מלאה לכל סוגי המשטחים והספות'
+                ]
+            },
+            {
+                id: 8,
+                title: 'מכונת קפה אוטומטית DeLonghi Magnifica Evo',
+                brand: 'DeLonghi',
+                category: 'appliances',
+                price: 2390,
+                originalPrice: 2790,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.8,
+                reviews: 93,
+                shortSpecs: 'מטחנת פולים מובנית | מקציף חלב LatteCrema | 7 מתכונים',
+                imageUrl: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי ברימאג',
+                fullSpecs: [
+                    'טחינה טרייה של פולי קפה בלחיצת כפתור אחת לכל כוס',
+                    'מערכת LatteCrema להקצפת חלב עשירה וקטיפתית באופן אוטומטי',
+                    'לוח בקרה צבעוני עם אייקונים למגע ישיר (אספרסו, קפוצ׳ינו, לאטה מקיאטו)',
+                    'תוכנית ניקוי עצמי אוטומטית למיכל החלב והמערכת',
+                    'אפשרות לכיוון דרגת הטחינה, חוזק הקפה והטמפרטורה'
+                ]
+            },
+            {
+                id: 9,
+                title: 'מקרר 4 דלתות Samsung 630L נירוסטה מושחרת',
+                brand: 'Samsung',
+                category: 'appliances',
+                price: 6890,
+                originalPrice: 7590,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.7,
+                reviews: 47,
+                shortSpecs: 'נפח 630 ליטר | מדחס Digital Inverter | קירור משולש',
+                imageUrl: 'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות מלאה + 10 שנות אחריות על המדחס',
+                fullSpecs: [
+                    'מערכת Triple Cooling השומרת על לחות אופטימלית ומונעת מעבר ריחות',
+                    'תא Cool Select+ הניתן להמרה ממקפיא למקרר בלחיצת כפתור',
+                    'פיקוד שבת מהדרין מובנה מאושר ע"י המכון המדעי הטכנולוגי',
+                    'תאורת LED פנימית בהירה וחסכונית, מדפי זכוכית מחוסמת',
+                    'מידות: רוחב 90.8 ס"מ, עומק 73.3 ס"מ, גובה 182.5 ס"מ'
+                ]
+            },
+            {
+                id: 10,
+                title: 'מכונת כביסה Bosch 9 ק"ג פתח חזית 1400 סל"ד',
+                brand: 'Bosch',
+                category: 'appliances',
+                price: 2490,
+                originalPrice: 2490,
+                onSale: false,
+                isNew: false,
+                inStock: true,
+                rating: 4.8,
+                reviews: 76,
+                shortSpecs: 'קיבולת 9 ק"ג | מנוע EcoSilence שקט | תוכנית מהירה 15 דק׳',
+                imageUrl: 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי BSH + 10 שנים למנוע',
+                fullSpecs: [
+                    'מנוע EcoSilence Drive ללא פחמים לפעולה שקטה ועמידות לאורך שנים',
+                    'טכנולוגיית ActiveWater Plus להתאמת צריכת המים למשקל הכביסה',
+                    'פונקציית SpeedPerfect המקצרת את זמן הכביסה בעד 65%',
+                    'תוף VarioDrum לשמירה עדינה על סיבי הבגדים',
+                    'אפשרות להוספת פריטים שנשכחו גם לאחר תחילת התוכנית'
+                ]
+            },
+            {
+                id: 16,
+                title: 'שואב שוטף רובוטי Roborock S8 MaxV Ultra',
+                brand: 'Roborock',
+                category: 'appliances',
+                price: 4690,
+                originalPrice: 5290,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.9,
+                reviews: 109,
+                shortSpecs: 'עוצמת שאיבה 10,000Pa | עמדת ריקון ושטיפה חמה | זרוע פינות',
+                imageUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי באג',
+                fullSpecs: [
+                    'עמדת עגינה All-in-One המרוקנת אבק, ממלאת מים, שוטפת במים חמים ומייבשת באוויר חם',
+                    'זרוע צד רובוטית FlexiArm המגיעה ל-100% מהפינות והפאנלים',
+                    'עוצמת שאיבה אדירה של 10,000Pa עם מברשת כפולה נגד הסתבכות שיער',
+                    'ניווט לייזר LiDAR + מצלמת AI לזיהוי ועקיפת מכשולים קטנים בבית',
+                    'שליטה מלאה באפליקציה בעברית כולל מיפוי תלת-ממדי'
+                ]
+            },
+            {
+                id: 39,
+                title: 'מכשיר בישול וצלייה Ninja Foodi Max Pro AG651',
+                brand: 'Ninja',
+                category: 'appliances',
+                price: 990,
+                originalPrice: 1290,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.9,
+                reviews: 184,
+                shortSpecs: 'גריל, טיגון באוויר חם ואפייה | מדחום דיגיטלי חכם | ללא עשן',
+                imageUrl: 'https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי שריג אלקטריק',
+                fullSpecs: [
+                    'חיישן טמפרטורה דיגיטלי המודד את מידת העשייה המדויקת בתוך הנתח',
+                    '7 תוכניות בישול: גריל, פלנצ׳ה, טיגון באוויר חם, צלייה, אפייה וייבוש',
+                    'חלקים נשלפים בציפוי קרמי Non-Stick הניתנים לשטיפה במדיח'
+                ]
+            },
+            {
+                id: 40,
+                title: 'מדיח כלים אינטגרלי מלא Bosch Serie 6 14 מערכות',
+                brand: 'Bosch',
+                category: 'appliances',
+                price: 3190,
+                originalPrice: 3590,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.8,
+                reviews: 52,
+                shortSpecs: 'טכנולוגיית ייבוש Zeolith | פעולה שקטה 42dB | מגירת סכו"ם 3',
+                imageUrl: 'https://images.unsplash.com/photo-1581622558663-b2e33377dfb2?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי BSH',
+                fullSpecs: [
+                    'ייבוש PerfectDry מבוסס מינרל Zeolith לייבוש מושלם גם של כלי פלסטיק',
+                    'הקרנת נקודת אור על הרצפה (InfoLight) כשהמדיח פועל',
+                    'שליטה מרחוק והתראות דרך אפליקציית Home Connect'
+                ]
+            },
+
+            // --- GADGETS & AUDIO (7) ---
+            {
+                id: 12,
+                title: 'אוזניות אלחוטיות Sony WH-1000XM5 ANC',
+                brand: 'Sony',
+                category: 'gadgets',
+                price: 1190,
+                originalPrice: 1490,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.9,
+                reviews: 189,
+                shortSpecs: 'ביטול רעשים מוביל בתעשייה | 30 שעות סוללה | טעינה מהירה',
+                imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי ישפאר',
+                fullSpecs: [
+                    'מערכת ביטול רעשים אקטיבית (ANC) המבוססת על 8 מיקרופונים ו-2 מעבדים',
+                    'סאונד Hi-Res Audio צלול ועשיר עם דרייברים 30 מ"מ מתקדמים',
+                    'עד 30 שעות האזנה רצופה, ו-3 דקות טעינה מעניקות 3 שעות שימוש',
+                    'חיבור Multipoint לשני מכשירים במקביל (מחשב וטלפון)',
+                    'כולל נרתיק נשיאה קשיח ומתקפל'
+                ]
+            },
+            {
+                id: 13,
+                title: 'אוזניות Apple AirPods Pro 2 (USB-C)',
+                brand: 'Apple',
+                category: 'gadgets',
+                price: 949,
+                originalPrice: 1090,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.9,
+                reviews: 240,
+                shortSpecs: 'שבב H2 | סינון רעשים כפול | מארז MagSafe עמיד במים',
+                imageUrl: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי Apple',
+                fullSpecs: [
+                    'שבב Apple H2 המספק ביטול רעשים אקטיבי עוצמתי פי 2',
+                    'מצב שקיפות אדפטיבי המפחית רעשים חזקים פתאומיים',
+                    'שמע מרחבי מותאם אישית (Personalized Spatial Audio)',
+                    'עמידות בפני אבק, זיעה ומים בתקן IP54 לאוזניות ולמארז',
+                    'מארז טעינה MagSafe עם חיבור USB-C, רמקול מובנה לאיתור ושרוך נשיאה'
+                ]
+            },
+            {
+                id: 14,
+                title: 'שעון חכם Apple Watch Series 10 GPS 46mm',
+                brand: 'Apple',
+                category: 'gadgets',
+                price: 1790,
+                originalPrice: 1990,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.8,
+                reviews: 82,
+                shortSpecs: 'מסך OLED רחב ודק במיוחד | חיישני בריאות | טעינה מהירה',
+                imageUrl: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי',
+                fullSpecs: [
+                    'העיצוב הדק ביותר אי פעם של Apple Watch עם מסך גדול וקריא מכל זווית',
+                    'ניטור דופק, אק"ג (ECG), מעקב שינה וזיהוי נפילות ותאונות',
+                    'עמידות למים עד עומק 50 מטר כולל מד עומק וטמפרטורת מים לשחייה',
+                    'טעינה מהירה: 80% סוללה תוך כ-30 דקות בלבד',
+                    'תמיכה מלאה בעברית, התראות, שיחות ו-Apple Pay'
+                ]
+            },
+            {
+                id: 25,
+                title: 'רמקול בלוטות׳ נייד JBL Charge 5 עמיד במים',
+                brand: 'JBL',
+                category: 'gadgets',
+                price: 549,
+                originalPrice: 649,
+                onSale: true,
+                isNew: false,
+                inStock: true,
+                rating: 4.8,
+                reviews: 156,
+                shortSpecs: 'סאונד JBL Pro עוצמתי | 20 שעות נגינה | עמידות IP67 + סוללת גיבוי',
+                imageUrl: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי מודן אלקטרוניקה',
+                fullSpecs: [
+                    'באס עמוק וסאונד חזק וברור גם בחוץ בים או בבריכה',
+                    'עמידות מלאה למים ולאבק בתקן IP67',
+                    'סוללה מובנית ל-20 שעות ניגון + יציאת USB לטעינת הטלפון הנייד',
+                    'חיבור PartyBoost לחיבור מספר רמקולים במקביל'
+                ]
+            },
+            {
+                id: 41,
+                title: 'רחפן צילום מקצועי DJI Mini 4 Pro Fly More Combo',
+                brand: 'DJI',
+                category: 'gadgets',
+                price: 4290,
+                originalPrice: 4690,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.9,
+                reviews: 94,
+                shortSpecs: 'משקל מתחת ל-249 גרם | צילום 4K/60fps HDR | חיישני מכשולים 360°',
+                imageUrl: 'https://images.unsplash.com/photo-1507582020474-9a35b7d455d9?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי בנדא מגנטיק',
+                fullSpecs: [
+                    'משקל קל במיוחד (פחות מ-249 גרם) לנשיאה לכל טיול בעולם',
+                    'חיישני זיהוי ומניעת מכשולים רב-כיווניים 360° לטיסה בטוחה',
+                    'ערכה מורחבת הכוללת 3 סוללות, רכזת טעינה, שלט עם מסך ותיק נשיאה'
+                ]
+            },
+            {
+                id: 42,
+                title: 'משקפי מציאות מדומה Meta Quest 3 512GB VR/MR',
+                brand: 'Meta',
+                category: 'gadgets',
+                price: 2590,
+                originalPrice: 2890,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.9,
+                reviews: 121,
+                shortSpecs: 'מציאות מעורבת צבעונית | עדשות Pancake חדות | ללא צורך במחשב',
+                imageUrl: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנה אחריות יבואן רשמי',
+                fullSpecs: [
+                    'מעבד Snapdragon XR2 Gen 2 לביצועים גרפיים כפולים',
+                    'מצלמות צבע ברזולוציה גבוהה המשלבות אובייקטים וירטואליים בחדר שלך',
+                    'כולל זוג שלטי Touch Plus מדויקים ללא טבעות חיצוניות'
+                ]
+            },
+            {
+                id: 43,
+                title: 'מצלמת אקסטרים GoPro HERO13 Black 5.3K',
+                brand: 'GoPro',
+                category: 'gadgets',
+                price: 1690,
+                originalPrice: 1890,
+                onSale: true,
+                isNew: true,
+                inStock: true,
+                rating: 4.8,
+                reviews: 66,
+                shortSpecs: 'וידאו 5.3K60 | ייצוב HyperSmooth 6.0 | עמידות במים עד 10 מ׳',
+                imageUrl: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80',
+                warranty: 'שנתיים אחריות יבואן רשמי DAA',
+                fullSpecs: [
+                    'ייצוב תמונה זוכה פרס אמי HyperSmooth 6.0 לצילום חלק בריצה ורכיבה',
+                    'סוללת Enduro משופרת לצילום ממושך גם בתנאי קור וחום',
+                    'תושבת חיבור מגנטית מהירה + הברגה סטנדרטית'
+                ]
+            }
+        ];
+
+        // Application State
+        let state = {
+            selectedCategory: 'all',
+            selectedBrand: 'all',
+            pricePreset: 'all',
+            searchQuery: '',
+            sortBy: 'featured',
+            saleOnly: false,
+            newOnly: false,
+            inStockOnly: false,
+            topRatedOnly: false,
+            maxPrice: 12000,
+            wishlistOnly: false,
+            wishlist: new Set([1, 18, 20]),
+            cart: [],
+            couponApplied: false
+        };
+
+        // Initialize Store on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            populateBrandSelect();
+            applyCategoryTheme('all');
+            renderCategoryTabs();
+            applyFilters();
+            updateWishlistBadge();
+            updateCartUI();
+        });
+
+        // Show all products and scroll smoothly to catalog
+        function showAllProductsScroll() {
+            resetFilters();
+            const catalogEl = document.getElementById('catalogSection');
+            if (catalogEl) {
+                catalogEl.scrollIntoView({ behavior: 'smooth' });
+            }
+            showToast(`מציג את כל ${PRODUCTS.length} המוצרים בחנות בגלילה חופשית! 🛍️`, 'success');
+        }
+
+        // Populate Brand Dropdown dynamically from PRODUCTS
+        function populateBrandSelect() {
+            const select = document.getElementById('brandSelect');
+            const brands = [...new Set(PRODUCTS.map(p => p.brand))].sort();
+            select.innerHTML = `<option value="all">כל המותגים (${PRODUCTS.length} מוצרים)</option>` +
+                brands.map(b => `<option value="${b}">${b}</option>`).join('');
+        }
+
+        // Dynamic Theme Updater whenever a Category is clicked
+        function applyCategoryTheme(categoryId) {
+            const cat = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[0];
+
+            // 1. Update Hero Banner Gradient & Texts
+            const heroBanner = document.getElementById('heroBanner');
+            heroBanner.style.background = `linear-gradient(135deg, #0f172a 0%, ${cat.darkHex} 50%, ${cat.primaryHex} 100%)`;
+
+            document.getElementById('heroBadgeIcon').textContent = cat.icon;
+            document.getElementById('heroBadgeText').textContent = cat.badgeText;
+
+            const heroTitle = document.getElementById('heroTitle');
+            heroTitle.classList.remove('animate-pop-in');
+            void heroTitle.offsetWidth;
+            heroTitle.textContent = cat.headline;
+            heroTitle.classList.add('animate-pop-in');
+
+            document.getElementById('heroSubtitle').textContent = cat.subheadline;
+
+            // 2. Update Header Logo & Cart Button Accent Color
+            document.getElementById('brandLogoBox').style.backgroundColor = cat.primaryHex;
+            document.getElementById('brandLogoAccent').style.color = cat.primaryHex;
+            document.getElementById('headerCartBtn').style.backgroundColor = cat.primaryHex;
+            document.getElementById('checkoutBtn').style.backgroundColor = cat.primaryHex;
+
+            // 3. Update Colored Category Strip above Catalog
+            const strip = document.getElementById('categoryDynamicBanner');
+            strip.style.backgroundColor = cat.lightBg;
+            strip.style.borderColor = cat.lightBorder;
+            strip.style.color = cat.lightText;
+
+            document.getElementById('stripIcon').textContent = cat.icon;
+            document.getElementById('stripTitle').textContent = cat.headline;
+            document.getElementById('stripSubtitle').textContent = cat.subheadline;
+
+            // 4. Update Active Pill Indicator & Price Slider Accent
+            const pillIndicator = document.getElementById('activeCategoryPillIndicator');
+            pillIndicator.textContent = `מחלקה פעילה: ${cat.name}`;
+            pillIndicator.style.backgroundColor = cat.lightBg;
+            pillIndicator.style.color = cat.primaryHex;
+
+            const priceRange = document.getElementById('maxPriceRange');
+            if (priceRange) {
+                priceRange.style.accentColor = cat.primaryHex;
+            }
+        }
+
+        // Render Category Filter Pills
+        function renderCategoryTabs() {
+            const container = document.getElementById('categoryTabs');
+            container.innerHTML = CATEGORIES.map(cat => {
+                const isActive = state.selectedCategory === cat.id && !state.wishlistOnly;
+                const count = cat.id === 'all' 
+                    ? PRODUCTS.length 
+                    : PRODUCTS.filter(p => p.category === cat.id).length;
+
+                const activeStyle = isActive 
+                    ? `background-color: ${cat.primaryHex}; color: #ffffff; border-color: ${cat.primaryHex}; box-shadow: 0 8px 18px -4px ${cat.primaryHex}66;` 
+                    : `background-color: #ffffff; color: #334155; border-color: #e2e8f0;`;
+
+                const countBadgeStyle = isActive
+                    ? `background-color: rgba(255,255,255,0.22); color: #ffffff;`
+                    : `background-color: #f1f5f9; color: #475569;`;
+
+                return `
+                    <button onclick="selectCategory('${cat.id}')" style="${activeStyle}"
+                        class="shrink-0 px-4 py-2.5 rounded-xl font-extrabold text-sm flex items-center gap-2 border transition-all duration-200 hover:-translate-y-0.5">
+                        <span class="text-base">${cat.icon}</span>
+                        <span>${cat.name}</span>
+                        <span style="${countBadgeStyle}" class="text-[11px] font-black px-2 py-0.5 rounded-full">${count}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // Category Selection Handlers
+        function selectCategory(categoryId) {
+            state.selectedCategory = categoryId;
+            state.wishlistOnly = false;
+            updateWishlistFilterButtonVisual();
+            applyCategoryTheme(categoryId);
+            renderCategoryTabs();
+            applyFilters();
+        }
+
+        function selectCategoryFromHero(categoryId) {
+            selectCategory(categoryId);
+            document.getElementById('catalogSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Price Preset Handler
+        function setPricePreset(preset) {
+            state.pricePreset = preset;
+            
+            // Update button active styles
+            document.querySelectorAll('.price-preset-btn').forEach(btn => {
+                if (btn.dataset.preset === preset) {
+                    btn.className = 'price-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white transition-all';
+                } else {
+                    btn.className = 'price-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all';
+                }
+            });
+
+            // Sync slider to max range when choosing presets
+            if (preset === 'under500') {
+                state.maxPrice = 500;
+                document.getElementById('maxPriceRange').value = 500;
+                document.getElementById('maxPriceLabel').textContent = '₪500';
+            } else {
+                state.maxPrice = 12000;
+                document.getElementById('maxPriceRange').value = 12000;
+                document.getElementById('maxPriceLabel').textContent = '₪12,000';
+            }
+
+            applyFilters();
+        }
+
+        // Search Handlers
+        function handleSearch(val) {
+            state.searchQuery = val.trim().toLowerCase();
+            document.getElementById('desktopSearchInput').value = val;
+            document.getElementById('mobileSearchInput').value = val;
+            
+            const hasText = val.length > 0;
+            document.getElementById('clearSearchBtnDesktop').classList.toggle('hidden', !hasText);
+            document.getElementById('clearSearchBtnMobile').classList.toggle('hidden', !hasText);
+            
+            applyFilters();
+        }
+
+        function clearSearch() {
+            handleSearch('');
+        }
+
+        // Price Range Label Update
+        function updatePriceLabel(val) {
+            state.maxPrice = Number(val);
+            state.pricePreset = 'all';
+            document.querySelectorAll('.price-preset-btn').forEach(btn => {
+                btn.className = btn.dataset.preset === 'all'
+                    ? 'price-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white transition-all'
+                    : 'price-preset-btn px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all';
+            });
+            document.getElementById('maxPriceLabel').textContent = `₪${Number(val).toLocaleString()}`;
+        }
+
+        // Wishlist Handlers
+        function toggleWishlist(event, productId) {
+            event.stopPropagation();
+            if (state.wishlist.has(productId)) {
+                state.wishlist.delete(productId);
+                showToast('הוסר מרשימת המועדפים', 'info');
+            } else {
+                state.wishlist.add(productId);
+                showToast('נוסף לרשימת המועדפים ❤️', 'success');
+            }
+            updateWishlistBadge();
+            applyFilters();
+        }
+
+        function updateWishlistBadge() {
+            const badge = document.getElementById('wishlistBadge');
+            const count = state.wishlist.size;
+            badge.textContent = count;
+            badge.classList.toggle('hidden', count === 0);
+        }
+
+        function toggleWishlistFilter() {
+            state.wishlistOnly = !state.wishlistOnly;
+            updateWishlistFilterButtonVisual();
+            renderCategoryTabs();
+            applyFilters();
+            if (state.wishlistOnly) {
+                document.getElementById('catalogSection').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function updateWishlistFilterButtonVisual() {
+            const btn = document.getElementById('wishlistFilterBtn');
+            const icon = document.getElementById('wishlistHeaderIcon');
+            if (state.wishlistOnly) {
+                btn.classList.add('border-rose-300', 'bg-rose-50', 'text-rose-700');
+                icon.classList.add('text-rose-500', 'fill-rose-500');
+            } else {
+                btn.classList.remove('border-rose-300', 'bg-rose-50', 'text-rose-700');
+                icon.classList.remove('text-rose-500', 'fill-rose-500');
+            }
+        }
+
+        // Reset All Filters
+        function resetFilters(e) {
+            if (e) e.preventDefault();
+            state.selectedCategory = 'all';
+            state.selectedBrand = 'all';
+            state.pricePreset = 'all';
+            state.searchQuery = '';
+            state.sortBy = 'featured';
+            state.saleOnly = false;
+            state.newOnly = false;
+            state.inStockOnly = false;
+            state.topRatedOnly = false;
+            state.maxPrice = 12000;
+            state.wishlistOnly = false;
+
+            document.getElementById('desktopSearchInput').value = '';
+            document.getElementById('mobileSearchInput').value = '';
+            document.getElementById('clearSearchBtnDesktop').classList.add('hidden');
+            document.getElementById('clearSearchBtnMobile').classList.add('hidden');
+            document.getElementById('brandSelect').value = 'all';
+            document.getElementById('saleOnlyToggle').checked = false;
+            document.getElementById('newOnlyToggle').checked = false;
+            document.getElementById('inStockOnlyToggle').checked = false;
+            document.getElementById('topRatedOnlyToggle').checked = false;
+            document.getElementById('maxPriceRange').value = 12000;
+            document.getElementById('maxPriceLabel').textContent = '₪12,000';
+            document.getElementById('sortSelect').value = 'featured';
+
+            setPricePreset('all');
+            updateWishlistFilterButtonVisual();
+            applyCategoryTheme('all');
+            renderCategoryTabs();
+            applyFilters();
+        }
+
+        // Core Filtering & Sorting Pipeline
+        function applyFilters() {
+            state.selectedBrand = document.getElementById('brandSelect').value;
+            state.saleOnly = document.getElementById('saleOnlyToggle').checked;
+            state.newOnly = document.getElementById('newOnlyToggle').checked;
+            state.inStockOnly = document.getElementById('inStockOnlyToggle').checked;
+            state.topRatedOnly = document.getElementById('topRatedOnlyToggle').checked;
+            state.sortBy = document.getElementById('sortSelect').value;
+
+            let filtered = PRODUCTS.filter(product => {
+                // Category filter
+                if (!state.wishlistOnly && state.selectedCategory !== 'all' && product.category !== state.selectedCategory) {
+                    return false;
+                }
+                // Wishlist filter
+                if (state.wishlistOnly && !state.wishlist.has(product.id)) {
+                    return false;
+                }
+                // Brand filter
+                if (state.selectedBrand !== 'all' && product.brand !== state.selectedBrand) {
+                    return false;
+                }
+                // Quick Price Presets
+                if (state.pricePreset === 'under500' && product.price > 500) return false;
+                if (state.pricePreset === '500to2000' && (product.price < 500 || product.price > 2000)) return false;
+                if (state.pricePreset === 'over2000' && product.price <= 2000) return false;
+
+                // Max Price Slider
+                if (product.price > state.maxPrice) return false;
+
+                // Attribute Toggles
+                if (state.saleOnly && !product.onSale) return false;
+                if (state.newOnly && !product.isNew) return false;
+                if (state.inStockOnly && !product.inStock) return false;
+                if (state.topRatedOnly && product.rating < 4.8) return false;
+
+                // Search query filter
+                if (state.searchQuery) {
+                    const catObj = CATEGORIES.find(c => c.id === product.category);
+                    const haystack = `${product.title} ${product.brand} ${product.shortSpecs} ${catObj ? catObj.name : ''}`.toLowerCase();
+                    if (!haystack.includes(state.searchQuery)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            // Sorting
+            if (state.sortBy === 'price-asc') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (state.sortBy === 'price-desc') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (state.sortBy === 'rating') {
+                filtered.sort((a, b) => b.rating - a.rating);
+            }
+
+            renderProducts(filtered);
+        }
+
+        // Render Product Cards Grid
+        function renderProducts(productsList) {
+            const grid = document.getElementById('productsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const countLabel = document.getElementById('resultsCount');
+            const activeTheme = CATEGORIES.find(c => c.id === state.selectedCategory) || CATEGORIES[0];
+
+            countLabel.textContent = state.wishlistOnly 
+                ? `המועדפים שלי (${productsList.length} מוצרים)` 
+                : `מציג ${productsList.length} מוצרים`;
+
+            if (productsList.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            grid.innerHTML = productsList.map(product => {
+                const isWishlisted = state.wishlist.has(product.id);
+                const categoryObj = CATEGORIES.find(c => c.id === product.category) || CATEGORIES[0];
+                const discountPercent = product.onSale 
+                    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
+                    : 0;
+
+                return `
+                    <article onclick="openProductModal(${product.id})" 
+                        class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden flex flex-col justify-between product-card-hover cursor-pointer group">
+                        
+                        <div>
+                            <!-- Visual Stage with Real Product Photography -->
+                            <div class="relative h-56 bg-slate-100 flex items-center justify-center overflow-hidden">
+                                <!-- Category Pill Colored by its Own Category -->
+                                <span style="color: ${categoryObj.primaryHex}; border-color: ${categoryObj.lightBorder};"
+                                    class="absolute top-3 right-3 z-10 bg-white/95 backdrop-blur-sm border text-[11px] font-extrabold px-2.5 py-1 rounded-lg shadow-sm">
+                                    ${categoryObj.icon} ${categoryObj.name}
+                                </span>
+
+                                <!-- Badges Stack (Sale / New) -->
+                                <div class="absolute bottom-3 right-3 z-10 flex items-center gap-1.5">
+                                    ${product.onSale ? `
+                                        <span class="bg-rose-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg shadow-sm">
+                                            מבצע -${discountPercent}%
+                                        </span>
+                                    ` : ''}
+                                    ${product.isNew ? `
+                                        <span class="bg-slate-900/90 backdrop-blur-xs text-white text-[11px] font-bold px-2 py-1 rounded-lg shadow-sm">
+                                            חדש ✨
+                                        </span>
+                                    ` : ''}
+                                </div>
+
+                                <!-- Wishlist Heart Button -->
+                                <button onclick="toggleWishlist(event, ${product.id})" title="הוסף למועדפים"
+                                    class="absolute top-3 left-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow-sm flex items-center justify-center transition-transform active:scale-90">
+                                    <svg class="w-5 h-5 ${isWishlisted ? 'text-rose-500 fill-rose-500' : 'text-slate-400 hover:text-rose-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- Real Product Photo -->
+                                <div class="w-full h-full overflow-hidden">
+                                    ${getProductImageHtml(product, 'w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500')}
+                                </div>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="p-5 pb-3">
+                                <!-- Rating & Brand -->
+                                <div class="flex items-center justify-between text-xs mb-1.5">
+                                    <span style="color: ${categoryObj.primaryHex};" class="font-extrabold uppercase tracking-wider">${product.brand}</span>
+                                    <div class="flex items-center gap-1 text-amber-500 font-bold">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <span class="text-slate-700">${product.rating}</span>
+                                        <span class="text-slate-400 font-normal">(${product.reviews})</span>
+                                    </div>
+                                </div>
+
+                                <!-- Product Title -->
+                                <h3 class="font-extrabold text-slate-900 text-base sm:text-lg leading-snug line-clamp-2 group-hover:opacity-80 transition-opacity">
+                                    ${product.title}
+                                </h3>
+
+                                <!-- Short Specs -->
+                                <p class="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                                    ${product.shortSpecs}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer: Pricing & Buttons -->
+                        <div class="p-5 pt-2">
+                            <div class="flex items-baseline gap-2 mb-3.5">
+                                <span class="text-2xl font-black text-slate-900">₪${product.price.toLocaleString()}</span>
+                                ${product.onSale ? `
+                                    <span class="text-sm text-slate-400 line-through font-medium">₪${product.originalPrice.toLocaleString()}</span>
+                                ` : ''}
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="addToCart(event, ${product.id})" style="background-color: ${activeTheme.primaryHex};"
+                                    class="flex-1 py-2.5 px-3 rounded-xl hover:opacity-90 active:scale-95 text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-1.5 theme-transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    <span>הוסף לסל</span>
+                                </button>
+                                <button onclick="openProductModal(${product.id}); event.stopPropagation();" title="פרטים נוספים"
+                                    class="py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-semibold text-xs transition-colors">
+                                    פרטים
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // SHOPPING CART & COUPON LOGIC
+        // ==========================================
+        function applyCouponCode() {
+            const input = document.getElementById('couponInput');
+            const feedback = document.getElementById('couponFeedback');
+            const code = input.value.trim().toUpperCase();
+
+            feedback.classList.remove('hidden', 'text-emerald-600', 'text-rose-500');
+
+            if (code === 'SAVE10') {
+                state.couponApplied = true;
+                feedback.textContent = '🎉 קופון SAVE10 הופעל! קיבלת 10% הנחה על הסל.';
+                feedback.classList.add('text-emerald-600');
+                updateCartUI();
+                showToast('קופון 10% הנחה הופעל בהצלחה!', 'success');
+            } else if (code === '') {
+                feedback.textContent = 'אנא הזן קוד קופון (לדוגמה: SAVE10)';
+                feedback.classList.add('text-rose-500');
+            } else {
+                feedback.textContent = 'קוד קופון לא תקין. נסה להזין SAVE10';
+                feedback.classList.add('text-rose-500');
+            }
+        }
+
+        function addToCart(event, productId) {
+            if (event) event.stopPropagation();
+            
+            const existingItem = state.cart.find(item => item.productId === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                state.cart.push({ productId, quantity: 1 });
+            }
+
+            const product = PRODUCTS.find(p => p.id === productId);
+            updateCartUI();
+            showToast(`"${product.title}" נוסף לסל הקניות! 🛒`, 'success');
+        }
+
+        // ==========================================
+        // PRODUCT QUICK-VIEW MODAL LOGIC
+        // ==========================================
+        function openProductModal(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            const categoryObj = CATEGORIES.find(c => c.id === product.category) || CATEGORIES[0];
+            const activeTheme = CATEGORIES.find(c => c.id === state.selectedCategory) || CATEGORIES[0];
+            const isWishlisted = state.wishlist.has(product.id);
+            const discountPercent = product.onSale 
+                ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
+                : 0;
+
+            const content = document.getElementById('productModalContent');
+            content.innerHTML = `
+                <div class="md:col-span-5 bg-slate-100 flex flex-col items-center justify-between relative min-h-[300px] overflow-hidden">
+                    <span style="color: ${categoryObj.primaryHex}; border-color: ${categoryObj.lightBorder};"
+                        class="absolute top-4 right-4 z-10 bg-white/95 backdrop-blur-sm border text-xs font-extrabold px-3 py-1 rounded-xl shadow-sm">
+                        ${categoryObj.icon} ${categoryObj.name}
+                    </span>
+                    <div class="w-full h-full min-h-[280px] flex-1">
+                        ${getProductImageHtml(product, 'w-full h-full object-cover')}
+                    </div>
+                    <span class="absolute bottom-3 z-10 text-xs font-bold text-slate-800 bg-white/95 backdrop-blur-sm px-3.5 py-1.5 rounded-full shadow-sm border border-slate-200/70">
+                        ${product.warranty}
+                    </span>
+                </div>
+
+                <div class="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-5">
+                    <div>
+                        <div class="flex items-center gap-2 text-xs font-extrabold mb-1" style="color: ${categoryObj.primaryHex};">
+                            <span>${product.brand}</span>
+                            <span>•</span>
+                            <span class="text-amber-500">⭐ ${product.rating} (${product.reviews} ביקורות)</span>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900 leading-snug">${product.title}</h3>
+                        
+                        <div class="flex items-baseline gap-3 mt-3">
+                            <span class="text-3xl font-black text-slate-900">₪${product.price.toLocaleString()}</span>
+                            ${product.onSale ? `
+                                <span class="text-base text-slate-400 line-through">₪${product.originalPrice.toLocaleString()}</span>
+                                <span class="bg-rose-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-lg">חיסכון ${discountPercent}%</span>
+                            ` : ''}
+                        </div>
+
+                        <div class="mt-5">
+                            <h4 class="text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-2.5">מפרט טכני ותכונות עיקריות:</h4>
+                            <ul class="space-y-2 text-sm text-slate-700">
+                                ${product.fullSpecs.map(spec => `
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-emerald-500 font-bold mt-0.5">✓</span>
+                                        <span>${spec}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex items-center gap-3">
+                        <button onclick="addToCart(event, ${product.id}); closeProductModal();" style="background-color: ${activeTheme.primaryHex};"
+                            class="flex-1 py-3.5 px-5 rounded-xl hover:opacity-95 text-white font-extrabold text-sm sm:text-base shadow-md transition-all flex items-center justify-center gap-2">
+                            <span>הוסף לסל הקניות</span>
+                        </button>
+                        <button onclick="toggleWishlist(event, ${product.id}); openProductModal(${product.id});"
+                            class="p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors" title="מועדפים">
+                            <svg class="w-6 h-6 ${isWishlisted ? 'text-rose-500 fill-rose-500' : 'text-slate-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('productModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function updateCartQuantity(productId, delta) {
+            const index = state.cart.findIndex(item => item.productId === productId);
+            if (index === -1) return;
+
+            state.cart[index].quantity += delta;
+            if (state.cart[index].quantity <= 0) {
+                state.cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            state.cart = state.cart.filter(item => item.productId !== productId);
+            updateCartUI();
+        }
+
+        function toggleCart(open) {
+            const drawer = document.getElementById('cartDrawer');
+            if (open) {
+                drawer.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            } else {
+                drawer.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItemsContainer');
+            const badge = document.getElementById('cartBadge');
+            const drawerCount = document.getElementById('drawerItemCount');
+            const subtotalEl = document.getElementById('cartSubtotal');
+            const discountRow = document.getElementById('discountRow');
+            const discountEl = document.getElementById('cartDiscount');
+            const shippingEl = document.getElementById('cartShipping');
+            const totalEl = document.getElementById('cartTotal');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+
+            const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            badge.textContent = totalItems;
+            drawerCount.textContent = `${totalItems} פריטים`;
+
+            if (state.cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 space-y-3">
+                        <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-800">סל הקניות שלך ריק</h4>
+                        <p class="text-xs text-slate-500 max-w-xs mx-auto">הוסף טלפונים, משחקי מכוניות או מוצרי חשמל מהקטלוג כדי להתחיל.</p>
+                    </div>
+                `;
+                subtotalEl.textContent = '₪0';
+                discountRow.classList.add('hidden');
+                shippingEl.textContent = '₪0';
+                totalEl.textContent = '₪0';
+                checkoutBtn.disabled = true;
+                updateShippingProgress(0);
+                return;
+            }
+
+            checkoutBtn.disabled = false;
+            let subtotal = 0;
+
+            container.innerHTML = state.cart.map(item => {
+                const product = PRODUCTS.find(p => p.id === item.productId);
+                const itemTotal = product.price * item.quantity;
+                subtotal += itemTotal;
+
+                return `
+                    <div class="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                        <div class="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200/60">
+                            ${getProductImageHtml(product, 'w-full h-full object-cover')}
+                        </div>
+                        
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-slate-900 truncate">${product.title}</h4>
+                            <p class="text-sm font-black text-slate-800 mt-0.5">₪${itemTotal.toLocaleString()}</p>
+                            
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="inline-flex items-center rounded-lg border border-slate-200 bg-slate-50">
+                                    <button onclick="updateCartQuantity(${product.id}, 1)" class="w-7 h-7 flex items-center justify-center text-slate-700 hover:bg-slate-200 rounded-r-lg font-bold">+</button>
+                                    <span class="px-2.5 text-xs font-extrabold text-slate-900">${item.quantity}</span>
+                                    <button onclick="updateCartQuantity(${product.id}, -1)" class="w-7 h-7 flex items-center justify-center text-slate-700 hover:bg-slate-200 rounded-l-lg font-bold">-</button>
+                                </div>
+
+                                <button onclick="removeFromCart(${product.id})" class="text-xs text-slate-400 hover:text-rose-500 font-semibold transition-colors">
+                                    הסר
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const discountAmount = state.couponApplied ? Math.round(subtotal * 0.1) : 0;
+            const discountedSubtotal = subtotal - discountAmount;
+
+            if (state.couponApplied) {
+                discountRow.classList.remove('hidden');
+                discountEl.textContent = `-₪${discountAmount.toLocaleString()}`;
+            } else {
+                discountRow.classList.add('hidden');
+            }
+
+            const freeShippingThreshold = 499;
+            const shippingCost = discountedSubtotal >= freeShippingThreshold ? 0 : 39;
+            const finalTotal = discountedSubtotal + shippingCost;
+
+            subtotalEl.textContent = `₪${subtotal.toLocaleString()}`;
+            shippingEl.textContent = shippingCost === 0 ? 'חינם 🎉' : `₪${shippingCost}`;
+            shippingEl.className = shippingCost === 0 ? 'font-bold text-emerald-600' : 'font-semibold text-slate-700';
+            totalEl.textContent = `₪${finalTotal.toLocaleString()}`;
+            document.getElementById('checkoutModalTotal').textContent = `₪${finalTotal.toLocaleString()}`;
+
+            updateShippingProgress(discountedSubtotal);
+        }
+
+        function updateShippingProgress(subtotal) {
+            const threshold = 499;
+            const bar = document.getElementById('shippingProgressBar');
+            const text = document.getElementById('shippingProgressText');
+
+            if (subtotal === 0) {
+                bar.style.width = '0%';
+                text.textContent = 'משלוח חינם בקנייה מעל ₪499';
+            } else if (subtotal >= threshold) {
+                bar.style.width = '100%';
+                text.textContent = '🎉 זכית במשלוח אקספרס חינם עד הבית!';
+            } else {
+                const percent = Math.min(100, Math.round((subtotal / threshold) * 100));
+                const remaining = threshold - subtotal;
+                bar.style.width = `${percent}%`;
+                text.textContent = `הוסף מוצרים ב-₪${remaining.toLocaleString()} לקבלת משלוח חינם!`;
+            }
+        }
+
+        // ==========================================
+        // CHECKOUT SIMULATION MODAL
+        // ==========================================
+        function openCheckoutModal() {
+            toggleCart(false);
+            document.getElementById('checkoutFormView').classList.remove('hidden');
+            document.getElementById('checkoutSuccessView').classList.add('hidden');
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            const randomOrderNum = Math.floor(10000 + Math.random() * 90000);
+            document.getElementById('orderNumberDisplay').textContent = `#IL-${randomOrderNum}`;
+            
+            document.getElementById('checkoutFormView').classList.add('hidden');
+            document.getElementById('checkoutSuccessView').classList.remove('hidden');
+            
+            // Clear cart & coupon
+            state.cart = [];
+            state.couponApplied = false;
+            document.getElementById('couponInput').value = '';
+            document.getElementById('couponFeedback').classList.add('hidden');
+            updateCartUI();
+        }
+
+        function finishOrderAndClose() {
+            closeCheckoutModal();
+            showToast('תודה על קנייתך באלקטרו-סטור!', 'success');
+        }
+
+        // ==========================================
+        // TOAST NOTIFICATIONS
+        // ==========================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const activeTheme = CATEGORIES.find(c => c.id === state.selectedCategory) || CATEGORIES[0];
+            
+            const bgClass = type === 'success' ? 'text-white border-white/20' : 'bg-white text-slate-800 border-slate-200';
+            toast.className = `${bgClass} border px-4 py-3 rounded-xl shadow-xl text-sm font-bold flex items-center gap-2.5 transform transition-all duration-300 translate-y-2 opacity-0`;
+            if (type === 'success') {
+                toast.style.backgroundColor = activeTheme.primaryHex;
+            }
+            
+            toast.innerHTML = `
+                <span class="w-2 h-2 rounded-full ${type === 'success' ? 'bg-white' : 'bg-slate-400'}"></span>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 2600);
+        }
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeProductModal();
+                toggleCart(false);
+                closeCheckoutModal();
+            }
+        });
+    </script>
+</body>
+</html>
